@@ -1,0 +1,65 @@
+/* Navbar.module.css */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    /* Align content to the edges */
+    align-items: center;
+    padding: 10px 20px;
+    /* Add padding */
+    border-bottom: 1px solid lightgrey;
+    /* Border at the bottom */
+}
+
+.navbarLeft {
+    display: flex;
+    gap: 20px;
+    /* Space between links */
+}
+
+.navbarCenter {
+    flex-grow: 1;
+    /* Center content */
+    text-align: center;
+    /* Align text to center */
+}
+
+.navbarRight {
+    display: flex;
+    align-items: center;
+    /* Center content vertically */
+}
+
+.signInButton {
+    background-color: rgb(0, 139, 245);
+    /* Blue background for sign-in button */
+    color: white;
+    /* White text */
+    padding: 5px 10px;
+    /* Padding */
+    border: none;
+    /* No border */
+    border-radius: 5px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Cursor changes to pointer */
+}
+
+.signOutButton {
+    background-color: rgb(0, 139, 245);
+    /* Red background for sign-out button */
+    color: white;
+    /* White text */
+    padding: 5px 10px;
+    /* Padding */
+    border: none;
+    /* No border */
+    border-radius: 5px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Cursor changes to pointer */
+}
+
+.link {
+    color: black;
+    text-decoration: none;
+}

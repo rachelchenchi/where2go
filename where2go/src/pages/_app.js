@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { onAuthStateChanged, getAuth } from 'firebase/auth'
 import firebaseApp from '../firebase'
 import "@/styles/globals.css";
+import NavBar from "../components/NavBar";
+import Footer from '../components/Footer';
 
 export default function App({ Component, pageProps }) {
   const [user, setUser] = useState(null)
@@ -16,5 +18,9 @@ export default function App({ Component, pageProps }) {
     });
   }, [])
 
-  return <Component user={user} {...pageProps} />;
+  return (<div>
+    <NavBar user={user} />
+    <Component user={user} {...pageProps} />
+    <Footer />
+  </div>);
 }

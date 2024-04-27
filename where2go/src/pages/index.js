@@ -26,8 +26,8 @@ export default function Home(props) {
       </Head>
       <main className={`${styles.main} ${inter.className}`}>
         <div className={styles.description}>
-          {props.user && <button onClick={onSignOutClicked}>Sign Out</button>}
-          {!props.user && <Link href="/login">Login</Link>}
+          {/* {props.user && <button onClick={onSignOutClicked}>Sign Out</button>}
+          {!props.user && <Link href="/login">Login</Link>} */}
           <p>
             {props.user && JSON.stringify(props.user, null, 2)}
             Get started by editing&nbsp;

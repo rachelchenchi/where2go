@@ -47,3 +47,29 @@ export const likePost = async (post) => {
 
 
 };
+
+
+//WHERE2GO DATABASE FUNCTIONS
+export const createPlace = async (place) => {
+    // Create a Place object with 3 properties: yelpUrl, tags, and rating
+    try {
+        await addDoc(collection(db, 'places'), place);
+        console.log('Place added to database');
+    } catch (error) {
+        console.error('Error adding place to database:', error);
+    }
+};
+
+export const getPlaces = async () => {
+    // Get all the places in your collection
+    // Each object should have an id, yelpUrl, tags, and rating
+    const result = [];
+    const querySnapshot = await getDocs(collection(db, 'places'));
+    querySnapshot.forEach((doc) => {
+        result.push({
+            id: doc.id,
+            ...doc.data()
+        });
+    });
+    return result;
+};
