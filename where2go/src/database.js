@@ -1,5 +1,5 @@
 import firebaseApp from "./firebase";
-import { getFirestore, collection, addDoc, getDoc, getDocs, doc, deleteDoc, updateDoc, increment } from "firebase/firestore";
+import { getFirestore, query, where, collection, addDoc, getDoc, getDocs, doc, deleteDoc, updateDoc, increment } from "firebase/firestore";
 
 // CS5356 TO-DO #0 Initialize Firestore
 const db = getFirestore(firebaseApp);
@@ -60,16 +60,36 @@ export const createPlace = async (place) => {
     }
 };
 
-export const getPlaces = async () => {
-    // Get all the places in your collection
-    // Each object should have an id, yelpUrl, tags, and rating
-    const result = [];
-    const querySnapshot = await getDocs(collection(db, 'places'));
-    querySnapshot.forEach((doc) => {
-        result.push({
-            id: doc.id,
-            ...doc.data()
-        });
-    });
-    return result;
+// export const getPlaces = async () => {
+//     // Get all the places in your collection
+//     // Each object should have an id, yelpUrl, tags, and rating
+//     const result = [];
+//     const querySnapshot = await getDocs(collection(db, 'places'));
+//     querySnapshot.forEach((doc) => {
+//         result.push({
+//             id: doc.id,
+//             ...doc.data()
+//         });
+//     });
+//     return result;
+// };
+
+export const getUserPlaces = async (userId) => {
+    if (!userId) {
+        throw new Error("User ID is required to fetch places");
+    }
+    const placesCollection = collection(db, 'places');
+    const userPlacesQuery = query(placesCollection, where('owner', '==', userId));
+    const snapshot = await getDocs(userPlacesQuery);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+export const deletePlace = async (place) => {
+    // Delete a place in your database
+    try {
+        await deleteDoc(doc(db, 'places', place.id));
+        console.log(`Place with ID ${place.id} deleted`);
+    } catch (error) {
+        console.error('Error deleting place:', error);
+    }
 };

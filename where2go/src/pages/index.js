@@ -11,10 +11,10 @@ const inter = Inter({ subsets: ["latin"] });
 
 export default function Home(props) {
 
-  const onSignOutClicked = () => {
-    const auth = getAuth(firebaseApp);
-    auth.signOut()
-  }
+  // const onSignOutClicked = () => {
+  //   const auth = getAuth(firebaseApp);
+  //   auth.signOut()
+  // }
 
   return (
     <>
