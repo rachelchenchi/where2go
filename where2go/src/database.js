@@ -84,12 +84,23 @@ export const getUserPlaces = async (userId) => {
     return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
-export const deletePlace = async (place) => {
+export const deletePlace = async (placeId) => {
     // Delete a place in your database
     try {
-        await deleteDoc(doc(db, 'places', place.id));
-        console.log(`Place with ID ${place.id} deleted`);
+        await deleteDoc(doc(db, 'places', placeId));
+        console.log(`Place with ID ${placeId} deleted`);
     } catch (error) {
         console.error('Error deleting place:', error);
     }
 };
+
+export const updatePlace = async (placeId, updatedData) => {
+    // Update a place in your database
+    try {
+        const placeRef = doc(db, 'places', placeId);
+        await updateDoc(placeRef, updatedData);
+        console.log(`Place with ID ${placeId} updated`);
+    } catch (error) {
+        console.error('Error updating place:', error);
+    }
+}

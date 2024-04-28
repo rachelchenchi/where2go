@@ -1,4 +1,4 @@
-const PlaceDisplay = ({ place, onDelete }) => {
+const PlaceDisplay = ({ place, onDelete, onEdit }) => {
     return (
         <div className="place-card">
             <h2>{place.name}</h2>
@@ -6,7 +6,8 @@ const PlaceDisplay = ({ place, onDelete }) => {
             <p>Tags: {place.tags}</p>
             <p>Rating: {place.rating}</p>
             <p>Visit Frequency: {place.visitFrequency}</p>
-            <button class="button is-danger" onClick={() => onDelete(place)}>Delete</button>
+            <button class="button is-danger" onClick={() => onDelete(place.id)}>Delete</button>
+            <button class="button is-primary" onClick={() => onEdit(place.id)}>Edit</button>
         </div>
     );
 };

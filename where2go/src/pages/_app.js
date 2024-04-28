@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 import NavBar from "../components/NavBar";
 import Footer from '../components/Footer';
 import { useRouter } from 'next/router';
+import '@/styles/stars.css'
 
 export default function App({ Component, pageProps }) {
   const [user, setUser] = useState(null);

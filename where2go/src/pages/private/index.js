@@ -2,7 +2,8 @@ import Head from 'next/head';
 import { useEffect, useState } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import AddPlaceModal from '../../components/PopUp/AddPlace';
-import PlaceDisplay from '../../components/PlaceDisplay';
+import EditPlaceModal from '../../components/PopUp/EditPlace';
+import PlaceDisplay from '../../components/places/PlaceDisplay';
 import * as db from '../../database';
 import { useRouter } from 'next/router';
 
@@ -10,6 +11,8 @@ const Private = ({ user }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [places, setPlaces] = useState([]);
     const router = useRouter();
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editPlace, setEditPlace] = useState(null);
 
     useEffect(() => {
         console.log("User state changed");
@@ -36,14 +39,27 @@ const Private = ({ user }) => {
         setPlaces((prevPlaces) => [...prevPlaces, newplace]);
     };
 
-    const handleDeletePlace = async (place) => {
+    const handleDeletePlace = async (placeId) => {
         try {
-            await db.deletePlace(place);
-            setPlaces((prevPlaces) => prevPlaces.filter((allplace) => allplace.id !== place.id));
+            await db.deletePlace(placeId);
+            setPlaces((prevPlaces) => prevPlaces.filter((allplace) => allplace.id !== placeId));
         } catch (error) {
             console.error('Error deleting place:', error);
         }
     };
+
+    const handleEditPlace = (place) => {
+        setEditPlace(place);
+        setIsEditModalOpen(true);
+    };
+
+    const handlePlaceUpdated = (placeId, updatedData) => {
+        setPlaces((prevPlaces) => prevPlaces.map((place) => {
+            return place.id === placeId ? { ...place, ...updatedData } : place;
+        }));
+    };
+
+
 
     return (
         <>
@@ -60,15 +76,26 @@ const Private = ({ user }) => {
                 >
                     +
                 </button>
-                <AddPlaceModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    onPlaceAdded={handlePlaceAdded}
-                />
+                <div>
+                    <AddPlaceModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onPlaceAdded={handlePlaceAdded}
+                    /></div>
+                <div>
+                    {isEditModalOpen && (
+                        <EditPlaceModal
+                            isOpen={isEditModalOpen}
+                            onClose={() => setIsEditModalOpen(false)}
+                            place={editPlace}
+                            onPlaceUpdated={handlePlaceUpdated}
+                        />
+                    )}
+                </div>
             </div >
             <div>
                 {places.map((place, index) => (
-                    <PlaceDisplay key={index} place={place} onDelete={handleDeletePlace} />
+                    <PlaceDisplay key={index} place={place} onDelete={handleDeletePlace} onEdit={() => handleEditPlace(place)} />
                 ))}
             </div>
 

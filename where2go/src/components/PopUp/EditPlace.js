@@ -1,38 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import * as db from '../../database';
-import { getAuth } from 'firebase/auth';
-import firebaseApp from '../../firebase';
 import styles from '../../styles/Modal.module.css';
 
-const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
+const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
     const [yelpUrl, setYelpUrl] = useState('');
     const [tags, setTags] = useState('');
     const [rating, setRating] = useState('');
     const [visitFrequency, setVisitFrequency] = useState('never');
 
+    useEffect(() => {
+        if (place) {
+            setYelpUrl(place.yelpUrl || '');
+            setTags(place.tags || '');
+            setRating(place.rating || '');
+            setVisitFrequency(place.visitFrequency || 'never');
+        }
+    }, [place]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const currentUser = getAuth(firebaseApp).currentUser;
-            const userId = currentUser ? currentUser.uid : null;
 
-            await db.createPlace({
+        try {
+            const updatedData = {
                 yelpUrl,
                 tags,
                 rating,
                 visitFrequency,
-                owner: userId,
-            });
-            if (onPlaceAdded) {
-                onPlaceAdded({ yelpUrl, tags, rating, visitFrequency, owner: userId });
+            };
+
+            await db.updatePlace(place.id, updatedData);
+
+            if (onPlaceUpdated) {
+                onPlaceUpdated(place.id, updatedData);
             }
-            console.log('Place created successfully');
+
             onClose();
         } catch (error) {
-            console.error('Error creating place:', error);
+            console.error('Error updating place:', error);
         }
-        // onClose();
     };
 
     if (!isOpen) {
@@ -43,7 +49,7 @@ const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
         <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeButton} onClick={onClose}>×</button>
-                <h2>Mark a Place of Your Interest!</h2>
+                <h2>Edit Place</h2>
                 <form onSubmit={handleSubmit}>
                     <div className={styles.field}>
                         <label>Yelp's URL</label>
@@ -150,5 +156,4 @@ const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
     );
 };
 
-export default AddPlaceModal;
-
+export default EditPlaceModal; 
