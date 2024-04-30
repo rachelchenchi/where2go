@@ -8,6 +8,22 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
     const [tags, setTags] = useState('');
     const [rating, setRating] = useState('');
     const [visitFrequency, setVisitFrequency] = useState('never');
+    const yelpUrlRegex = /https?:\/\/www\.yelp\.com\/biz\/([a-z0-9-]+)/i;
+
+    const getYelpBusinessId = (url) => {
+        const match = url.match(yelpUrlRegex);
+        return match ? match[1] : null;
+    };
+
+    const fetchYelpDetails = async (businessId) => {
+        const response = await fetch(`/api/yelp/${businessId}`);
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            throw new Error('Failed to fetch Yelp business details');
+        }
+    };
 
     useEffect(() => {
         if (place) {
@@ -22,17 +38,41 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
         e.preventDefault();
 
         try {
-            const updatedData = {
-                yelpUrl,
-                tags,
-                rating,
-                visitFrequency,
-            };
+            const businessId = getYelpBusinessId(yelpUrl);
 
-            await db.updatePlace(place.id, updatedData);
+            if (businessId) {
+                const businessDetails = await fetchYelpDetails(businessId);
+                console.log('Business details:', businessDetails);
+                const updatedData = {
+                    yelpUrl,
+                    tags,
+                    rating,
+                    visitFrequency,
+                    // ...businessDetails,
+                    name: businessDetails.name,
+                    imageUrl: businessDetails.image_url,
+                    coordinates: businessDetails.coordinates,
+                }
 
-            if (onPlaceUpdated) {
-                onPlaceUpdated(place.id, updatedData);
+                await db.updatePlace(place.id, updatedData);
+
+                if (onPlaceUpdated) {
+                    onPlaceUpdated(place.id, updatedData);
+                }
+            } else {
+                console.log('Invalid Yelp URL, but its your choice:(');
+                const updatedData = {
+                    yelpUrl,
+                    tags,
+                    rating,
+                    visitFrequency,
+                }
+                await db.updatePlace(place.id, updatedData);
+                if (onPlaceUpdated) {
+                    onPlaceUpdated(place.id, updatedData);
+                }
+                console.log('Place created successfully');
+                onClose();
             }
 
             onClose();

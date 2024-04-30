@@ -93,9 +93,9 @@ const Private = ({ user }) => {
                     )}
                 </div>
             </div >
-            <div>
+            <div className="places-container">
                 {places.map((place, index) => (
-                    <PlaceDisplay key={index} place={place} onDelete={handleDeletePlace} onEdit={() => handleEditPlace(place)} />
+                    <PlaceDisplay key={index} className="place-display" place={place} onDelete={handleDeletePlace} onEdit={() => handleEditPlace(place)} />
                 ))}
             </div>
 

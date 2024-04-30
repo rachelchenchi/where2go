@@ -11,24 +11,69 @@ const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
     const [rating, setRating] = useState('');
     const [visitFrequency, setVisitFrequency] = useState('never');
 
+    const yelpUrlRegex = /https?:\/\/www\.yelp\.com\/biz\/([a-z0-9-]+)/i;
+
+    const getYelpBusinessId = (url) => {
+        const match = url.match(yelpUrlRegex);
+        return match ? match[1] : null;
+    };
+
+    const fetchYelpDetails = async (businessId) => {
+        const response = await fetch(`/api/yelp/${businessId}`);
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            throw new Error('Failed to fetch Yelp business details');
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const currentUser = getAuth(firebaseApp).currentUser;
             const userId = currentUser ? currentUser.uid : null;
 
-            await db.createPlace({
-                yelpUrl,
-                tags,
-                rating,
-                visitFrequency,
-                owner: userId,
-            });
-            if (onPlaceAdded) {
-                onPlaceAdded({ yelpUrl, tags, rating, visitFrequency, owner: userId });
+            const businessId = getYelpBusinessId(yelpUrl);
+            console.log('Business ID:', businessId);
+
+            if (businessId) {
+                const businessDetails = await fetchYelpDetails(businessId);
+                console.log('Business details:', businessDetails);
+                const placeData = {
+                    yelpUrl,
+                    tags,
+                    rating,
+                    visitFrequency,
+                    owner: userId,
+                    // ...businessDetails,
+                    name: businessDetails.name,
+                    imageUrl: businessDetails.image_url,
+                    coordinates: businessDetails.coordinates,
+                }
+                await db.createPlace(placeData);
+                if (onPlaceAdded) {
+                    onPlaceAdded(placeData);
+                }
+                console.log('Place created successfully');
+                onClose();
             }
-            console.log('Place created successfully');
-            onClose();
+            else {
+                console.log('Invalid Yelp URL, but its your choice:(');
+                await db.createPlace({
+                    yelpUrl,
+                    tags,
+                    rating,
+                    visitFrequency,
+                    owner: userId,
+                });
+                if (onPlaceAdded) {
+                    onPlaceAdded({ yelpUrl, tags, rating, visitFrequency, owner: userId });
+                }
+                console.log('Place created successfully');
+                onClose();
+            }
+
         } catch (error) {
             console.error('Error creating place:', error);
         }
@@ -136,8 +181,8 @@ const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
                             onChange={(e) => setVisitFrequency(e.target.value)}
                         >
                             <option value="never">Never</option>
-                            <option value="0-2 times">0-2 times</option>
-                            <option value="more than 2 times">More than 2 times</option>
+                            <option value="0-2 times">1-3 times</option>
+                            <option value="more than 2 times">More than 3 times!</option>
                         </select>
                     </div>
                     <div className={styles.field}>
