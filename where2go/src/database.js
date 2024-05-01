@@ -115,9 +115,9 @@ export const getCommunityPlaces = async () => {
 
 
 
-```
-group - vote functions
-```
+//////////////////////////
+// group - vote functions
+//////////////////////////
 
 // Get saved places from private space
 export const getSavedPlaces = async (userId) => {
