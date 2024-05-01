@@ -112,3 +112,13 @@ export const getCommunityPlaces = async () => {
     const allPlaces = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     return allPlaces.sort(() => 0.5 - Math.random()).slice(0, 3);
 }
+
+//group functions
+export const getSavedPlaces = async (userId) => {
+    const placesRef = collection(db, 'users', userId, 'places');
+    const querySnapshot = await getDocs(placesRef);
+    return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+};
