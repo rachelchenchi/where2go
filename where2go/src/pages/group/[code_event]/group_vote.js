@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import PickaTime from '../../../components/groupVote/PickaTime';
-import Dropdown from '../../../components/groupVote/Dropdown';
-import * as db from '../../database';
+import PickaTime from '@/components/groupVote/pickTime'
+import Dropdown from '@/components/groupVote/dropdown';
+import * as db from '@/database'
 import { useRouter } from 'next/router';
 
 const GroupVote = () => {

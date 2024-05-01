@@ -10,6 +10,8 @@ import React, { useState, useEffect } from 'react';
 import * as db from '../database';
 import PlaceDisplay from '../components/places/PlaceDisplay';
 
+
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home(props) {
@@ -52,6 +54,11 @@ export default function Home(props) {
           </p>
         </div> */}
         <section class="hero is-medium">
+        {/* <section class="hero is-medium" style={{
+          backgroundImage: "url('../assets/background.jpeg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}> */}
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} class="title is-1 has-text-white has-text-weight-bold">
