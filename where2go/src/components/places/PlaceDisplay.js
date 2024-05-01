@@ -12,7 +12,7 @@ const mapOptions = {
 };
 
 
-const PlaceDisplay = ({ place, onDelete, onEdit }) => {
+const PlaceDisplay = ({ place, onDelete, onEdit, showButtons = true }) => {
     const [showMap, setShowMap] = useState(false);
 
     const center = place && place.coordinates ? {
@@ -27,12 +27,24 @@ const PlaceDisplay = ({ place, onDelete, onEdit }) => {
             <h2>{place.name}</h2>
             {place.imageUrl && <img src={place.imageUrl} alt={`Image of ${place.name}`} style={{ width: '100%', height: '400px', marginBottom: '10px' }} />}
             <p>Yelp URL: <a href={place.yelpUrl} target="_blank" rel="noopener noreferrer">{place.yelpUrl}</a></p>
-            <p>Tags: {place.tags}</p>
-            <p>Rating: {place.rating}</p>
+            <p>Tags:<span style={{
+                backgroundColor: "rgb(230, 240, 250)",
+                marginLeft: "10px",
+                padding: "5px 20px",
+                borderRadius: "15px",
+                display: "inline-block"
+            }}> {place.tags}</span></p>
+            <div style={{ marginLeft: "20px" }} className="starability-result" data-rating={place.rating} aria-label={`Rating: ${place.rating} out of 5.`}>
+                Rating: {place.rating}
+            </div>
             <p>Visit Frequency: {place.visitFrequency}</p>
-            <button style={{ margin: "5px 10px" }} class="button is-danger" onClick={() => onDelete(place.id)}>Delete</button>
-            <button style={{ margin: "5px 10px" }} class="button is-primary" onClick={() => onEdit(place.id)}>Edit</button>
-            {center && <button style={{ margin: "5px 10px" }} class="button is-info" onClick={toggleMap}>Show Map</button>}
+            {showButtons && (
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <button style={{ width: '100px', margin: "5px 10px", marginBottom: "10px" }} class="button is-danger" onClick={() => onDelete(place.id)}>Delete</button>
+                    <button style={{ width: '100px', margin: "5px 10px", marginBottom: "10px" }} class="button is-primary" onClick={() => onEdit(place.id)}>Edit</button>
+                    {center && <button style={{ width: '100px', margin: "5px 10px", marginBottom: "10px" }} class="button is-info" onClick={toggleMap}>Show Map</button>}
+                </div>
+            )}
             {
                 showMap && (
                     <div className={styles.modal}>

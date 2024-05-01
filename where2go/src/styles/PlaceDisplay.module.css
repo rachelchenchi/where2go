@@ -9,12 +9,13 @@
 } */
 
 .placeCard {
-    flex: 1 1 22%;
+    /* flex: 1 1 22%; */
     background: #fff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    margin: 20px;
+    margin: 10px;
     display: flex;
+    width: 450px;
     flex-direction: column;
     overflow: hidden;
     min-width: 300px;
@@ -23,7 +24,7 @@
 
 .placeCard img {
     width: 90%;
-    height: 200px;
+    height: 150px;
     object-fit: cover;
     padding-left: 20px;
     padding-right: 20px;
@@ -39,7 +40,7 @@
 
 .placeCard p,
 .placeCard a {
-    padding: 0 15px;
+    padding: 0 20px;
 }
 
 .placeCard p {
