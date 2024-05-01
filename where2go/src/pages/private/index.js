@@ -70,14 +70,14 @@ const Private = ({ user }) => {
             <div className="container">
                 <h1 style={{ marginTop: "20px", display: "flex", justifyContent: "center" }} className="title">Private Space</h1>
 
-                <div style={{ display: "flex", justifyContent: "center" }} >
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
                     <button
                         className="button is-info is-large"
                         onClick={() => setIsModalOpen(true)}
                     >
                         +
                     </button>
-                    <h2 className='subtitle'>
+                    <h2 class="subtitle" style={{ marginLeft: "10px", fontWeight: "bold" }} >
                         Add a new place!
                     </h2>
                 </div>
