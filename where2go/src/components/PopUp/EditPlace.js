@@ -86,7 +86,7 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
                     console.log('Place ID:', place.id);
                     await db.updatePlace(place.id, updatedData);
                     if (onPlaceUpdated) {
-                        onPlaceUpdated({ yelpUrl, tags, rating, visitFrequency });
+                        onPlaceUpdated(place.id, updatedData);
                     }
                     console.log('Place updated successfully');
                 }

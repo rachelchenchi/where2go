@@ -8,6 +8,7 @@
     /* Add padding */
     border-bottom: 1px solid lightgrey;
     /* Border at the bottom */
+    background-color: white;
 }
 
 .navbarLeft {

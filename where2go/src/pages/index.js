@@ -54,10 +54,10 @@ export default function Home(props) {
         <section class="hero is-medium">
           <div class="hero-body">
             <div class="container has-text-centered">
-              <h1 class="title is-1 has-text-white has-text-weight-bold">
+              <h1 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} class="title is-1 has-text-white has-text-weight-bold">
                 Welcome to Where2Go
               </h1>
-              <h2 class="subtitle is-3 has-text-white">
+              <h2 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} class="subtitle is-3 has-text-white">
                 Enjoy every moment!
               </h2>
             </div>

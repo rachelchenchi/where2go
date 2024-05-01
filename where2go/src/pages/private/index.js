@@ -68,14 +68,19 @@ const Private = ({ user }) => {
             </Head>
 
             <div className="container">
-                <h1 className="title">Private Space</h1>
+                <h1 style={{ marginTop: "20px", display: "flex", justifyContent: "center" }} className="title">Private Space</h1>
 
-                <button
-                    className="button is-primary"
-                    onClick={() => setIsModalOpen(true)}
-                >
-                    +
-                </button>
+                <div style={{ display: "flex", justifyContent: "center" }} >
+                    <button
+                        className="button is-info is-large"
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        +
+                    </button>
+                    <h2 className='subtitle'>
+                        Add a new place!
+                    </h2>
+                </div>
                 <div>
                     <AddPlaceModal
                         isOpen={isModalOpen}
