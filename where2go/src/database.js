@@ -104,3 +104,10 @@ export const updatePlace = async (placeId, updatedData) => {
         console.error('Error updating place:', error);
     }
 }
+
+
+// Group - Vote Functions
+export const getSavedPlaces = async (userId) => {
+    const snapshot = await db.collection('users').doc(userId).collection('places').get();
+    return snapshot.docs.map(doc => doc.data());
+};
