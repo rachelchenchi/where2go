@@ -107,7 +107,12 @@ export const updatePlace = async (placeId, updatedData) => {
 
 
 // Group - Vote Functions
+
 export const getSavedPlaces = async (userId) => {
-    const snapshot = await db.collection('users').doc(userId).collection('places').get();
-    return snapshot.docs.map(doc => doc.data());
+    const placesRef = collection(db, 'users', userId, 'places');
+    const querySnapshot = await getDocs(placesRef);
+    return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
 };
