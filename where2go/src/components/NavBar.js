@@ -25,9 +25,12 @@ const Navbar = ({ user }) => {
             </div>
             <div className={styles.navbarRight}> {/* Navigation links on the right */}
                 {user ? (
+                    <>
+                    <span className={styles.userName}>{user.displayName || user.uid}</span>
                     <button onClick={onSignOutClicked} className={styles.signOutButton}>
                         Sign Out
                     </button>
+                    </>
                 ) : (
                     <Link href="/login">
                         <button className={styles.signInButton}>Sign in</button>

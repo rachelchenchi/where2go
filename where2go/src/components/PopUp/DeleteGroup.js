@@ -8,26 +8,6 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
     const [tags, setTags] = useState('');
     const [rating, setRating] = useState('');
     const [visitFrequency, setVisitFrequency] = useState('never');
-    const [publishToCommunity, setPublishToCommunity] = useState(false);
-
-    const yelpUrlRegex = /^(https?:\/\/)?www\.yelp\.com\/biz\/([a-z0-9-]+)/i;
-
-
-    const getYelpBusinessId = (url) => {
-        const match = url.match(yelpUrlRegex);
-        return match ? match[2] : null;
-    };
-    // console.log(getYelpBusinessId("www.yelp.com/biz/some-business-id"));
-
-    const fetchYelpDetails = async (businessId) => {
-        const response = await fetch(`/api/yelp/${businessId}`);
-        if (response.ok) {
-            const data = await response.json();
-            return data;
-        } else {
-            throw new Error('Failed to fetch Yelp business details');
-        }
-    };
 
     useEffect(() => {
         if (place) {
@@ -35,7 +15,6 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
             setTags(place.tags || '');
             setRating(place.rating || '');
             setVisitFrequency(place.visitFrequency || 'never');
-            setPublishToCommunity(place.publishToCommunity || false);
         }
     }, [place]);
 
@@ -43,68 +22,17 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
         e.preventDefault();
 
         try {
-            const businessId = getYelpBusinessId(yelpUrl);
-            // console.log('Business ID:', businessId);
-            let businessDetails = null;
-            if (businessId) {
-                try {
-                    businessDetails = await fetchYelpDetails(businessId);
-                    console.log('Business details:', businessDetails);
-                } catch (error) {
-                    console.log('Failed to fetch Yelp business details, handling as invalid URL');
-                }
-                if (businessDetails) {
-                    const updatedData = {
-                        yelpUrl,
-                        tags,
-                        rating,
-                        visitFrequency,
-                        publishToCommunity,
-                        // ...businessDetails,
-                        name: businessDetails.name,
-                        imageUrl: businessDetails.image_url,
-                        coordinates: businessDetails.coordinates,
-                    }
+            const updatedData = {
+                yelpUrl,
+                tags,
+                rating,
+                visitFrequency,
+            };
 
-                    await db.updatePlace(place.id, updatedData);
+            await db.updatePlace(place.id, updatedData);
 
-                    if (onPlaceUpdated) {
-                        onPlaceUpdated(place.id, updatedData);
-                    }
-                }
-
-                else {
-                    console.log('Invalid Yelp URL, creating place with minimal data');
-                    const updatedData = {
-                        yelpUrl,
-                        tags,
-                        rating,
-                        visitFrequency,
-                        publishToCommunity,
-                    }
-                    console.log('Updated Data:', updatedData);
-                    console.log('Place ID:', place.id);
-                    await db.updatePlace(place.id, updatedData);
-                    if (onPlaceUpdated) {
-                        onPlaceUpdated(place.id, updatedData);
-                    }
-                    console.log('Place updated successfully');
-                }
-            } else {
-                console.log('Invalid Yelp URL, but its your choice:(');
-                const updatedData = {
-                    yelpUrl,
-                    tags,
-                    rating,
-                    visitFrequency,
-                    publishToCommunity,
-                }
-                await db.updatePlace(place.id, updatedData);
-                if (onPlaceUpdated) {
-                    onPlaceUpdated(place.id, updatedData);
-                }
-                console.log('Place updated successfully');
-                onClose();
+            if (onPlaceUpdated) {
+                onPlaceUpdated(place.id, updatedData);
             }
 
             onClose();
@@ -118,7 +46,7 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
     }
 
     return createPortal(
-        <div className={styles.modalOverlay} >
+        <div className={styles.modalOverlay} onClick={onClose}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                 <button className={styles.closeButton} onClick={onClose}>×</button>
                 <h2>Edit Place</h2>
@@ -214,20 +142,9 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
                             onChange={(e) => setVisitFrequency(e.target.value)}
                         >
                             <option value="never">Never</option>
-                            <option value="0-2 times">1-3 times</option>
-                            <option value="more than 2 times">More than 3 times!</option>
+                            <option value="0-2 times">0-2 times</option>
+                            <option value="more than 2 times">More than 2 times</option>
                         </select>
-                    </div>
-                    <div className={styles.field}>
-                        <label>
-                            <input
-                                type="checkbox"
-                                checked={publishToCommunity}
-                                style={{ marginRight: '10px' }}
-                                onChange={(e) => setPublishToCommunity(e.target.checked)}
-                            />
-                            Publish to community?
-                        </label>
                     </div>
                     <div className={styles.field}>
                         <button className={styles.button} type="submit">Submit</button>

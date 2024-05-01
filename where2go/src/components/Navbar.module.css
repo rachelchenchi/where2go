@@ -8,6 +8,7 @@
     /* Add padding */
     border-bottom: 1px solid lightgrey;
     /* Border at the bottom */
+    background-color: white;
 }
 
 .navbarLeft {
@@ -21,6 +22,7 @@
     /* Center content */
     text-align: center;
     /* Align text to center */
+    font-weight: bold;
 }
 
 .navbarRight {
@@ -62,4 +64,9 @@
 .link {
     color: black;
     text-decoration: none;
+}
+
+.userName {
+    margin-right: 10px;
+    /* font-weight: bold; */
 }

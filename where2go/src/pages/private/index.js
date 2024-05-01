@@ -68,14 +68,19 @@ const Private = ({ user }) => {
             </Head>
 
             <div className="container">
-                <h1 className="title">Private Space</h1>
+                <h1 style={{ marginTop: "20px", display: "flex", justifyContent: "center" }} className="title">Private Space</h1>
 
-                <button
-                    className="button is-primary"
-                    onClick={() => setIsModalOpen(true)}
-                >
-                    +
-                </button>
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }} >
+                    <button
+                        className="button is-info is-large"
+                        onClick={() => setIsModalOpen(true)}
+                    >
+                        +
+                    </button>
+                    <h2 class="subtitle" style={{ marginLeft: "10px", fontWeight: "bold" }} >
+                        Add a new place!
+                    </h2>
+                </div>
                 <div>
                     <AddPlaceModal
                         isOpen={isModalOpen}
@@ -93,9 +98,9 @@ const Private = ({ user }) => {
                     )}
                 </div>
             </div >
-            <div>
+            <div className="places-container">
                 {places.map((place, index) => (
-                    <PlaceDisplay key={index} place={place} onDelete={handleDeletePlace} onEdit={() => handleEditPlace(place)} />
+                    <PlaceDisplay key={index} className="place-display" place={place} onDelete={handleDeletePlace} onEdit={() => handleEditPlace(place)} />
                 ))}
             </div>
 

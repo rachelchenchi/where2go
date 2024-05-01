@@ -3,13 +3,13 @@ import * as db from '../../database';
 import { useRouter } from 'next/router';
 
 
+const PickaTime = ({ }) => {
 
-const Dropdown = ({ options, value, onChange}) => {
+    return (
+        <div>
 
-
-    return(
-        <div></div>
+        </div>
     )
 };
 
-export default Dropdown;
+export default PickaTime;

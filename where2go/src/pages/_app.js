@@ -5,7 +5,8 @@ import "@/styles/globals.css";
 import NavBar from "../components/NavBar";
 import Footer from '../components/Footer';
 import { useRouter } from 'next/router';
-import '@/styles/stars.css'
+import '@/styles/stars.css';
+import { LoadScript } from '@react-google-maps/api';
 
 export default function App({ Component, pageProps }) {
   const [user, setUser] = useState(null);
@@ -23,8 +24,12 @@ export default function App({ Component, pageProps }) {
   }, [])
 
   return (<div>
-    <NavBar user={user} />
-    <Component user={user} {...pageProps} />
-    <Footer />
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY}>
+      <div>
+        <NavBar user={user} />
+        <Component user={user} {...pageProps} />
+        <Footer />
+      </div>
+    </LoadScript>
   </div>);
 }

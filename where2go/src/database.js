@@ -104,3 +104,21 @@ export const updatePlace = async (placeId, updatedData) => {
         console.error('Error updating place:', error);
     }
 }
+
+export const getCommunityPlaces = async () => {
+    const placesCollection = collection(db, 'places');
+    const communityPlacesQuery = query(placesCollection, where('publishToCommunity', '==', true));
+    const snapshot = await getDocs(communityPlacesQuery);
+    const allPlaces = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return allPlaces.sort(() => 0.5 - Math.random()).slice(0, 3);
+}
+
+//group functions
+export const getSavedPlaces = async (userId) => {
+    const placesRef = collection(db, 'users', userId, 'places');
+    const querySnapshot = await getDocs(placesRef);
+    return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+};
