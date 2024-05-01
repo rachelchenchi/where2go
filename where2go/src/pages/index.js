@@ -53,16 +53,20 @@ export default function Home(props) {
             <code className={styles.code}>src/pages/index.js</code>
           </p>
         </div> */}
-        <section class="hero is-medium">
-        {/* <section class="hero is-medium" style={{
-          backgroundImage: "url('../assets/background.jpeg')",
+        {/* <section class="hero is-medium"> */}
+        <section class="hero is-medium" style={{
+          // backgroundImage: "url('/assets/background.jpeg')",
+          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/background3.jpeg')",
           backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}> */}
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          width: '100%',
+          minHeight: '100vh'
+        }}>
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} class="title is-1 has-text-white has-text-weight-bold">
-                Welcome to Where2Go
+                Welcome to WHERE2GO
               </h1>
               <h2 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} class="subtitle is-3 has-text-white">
                 Enjoy every moment!
