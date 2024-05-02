@@ -78,6 +78,12 @@ const Group = ({ user }) => {
 
       const groupData = await db.getGroup(groupId);
 
+      // check if current user is already a member:
+      if (groupData.members.some(member => member.userId === user.uid)) {
+        console.log("User already a member of the group.");
+        alert("You are already a member of the group.");
+        return;
+      }
       // add a member in members array with
       const newMember = {
         userName: user.displayName,
