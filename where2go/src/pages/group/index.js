@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import EditGroupModal from "../../components/PopUp/EditGroup";
 import DeleteGroupModal from "../../components/PopUp/DeleteGroup";
+import GroupDisplay from "../../components/groups/GroupDisplay";  
 import * as db from "../../database";
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Link from "next/link";
 
 const Group = ({ user }) => {
   const [groups, setGroups] = useState([]);
-  const router = useRouter()
+  const router = useRouter();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -266,63 +266,16 @@ const Group = ({ user }) => {
             {/* <th>Delete?</th> */}
           </thead>
           <tbody>
-            {groups?.map((group, index) => {
-              return (
-                <tr key={index}>
-                  <td>
-                    <Link href={`/group/${group.id}`}>{group.groupName}</Link>
-                  </td>
-                  <td>
-                    {group.members.map((member, index) => {
-                      return member.role === "owner" ? member.userName : "";
-                    })}
-                  </td>
-                  <td>
-                    {group.members.map((member) => member.userName).join(", ")}
-                  </td>
-                  <td>
-                    {new Date(group.startDate).toLocaleDateString() ===
-                    new Date(group.endDate).toLocaleDateString()
-                      ? new Date(group.startDate).toLocaleDateString()
-                      : `${new Date(
-                          group.startDate
-                        ).toLocaleDateString()} - ${new Date(
-                          group.endDate
-                        ).toLocaleDateString()}`}
-                  </td>
-                  <td>
-                    {group.createdAt
-                      ? new Date(group.createdAt).toLocaleDateString()
-                      : "No date"}
-                  </td>
-                  <td>
-                    <button
-                      className="button is-info"
-                      onClick={() => onCopyGroupUrl(group.id)}
-                    >
-                      Copy URL
-                    </button>
-                  </td>
-                  <td>
-                    {group.ownerId === user.uid ? (
-                      <button
-                        className="button is-primary"
-                        onClick={() => onManageGroup(group.id)}
-                      >
-                        Manage
-                      </button>
-                    ) : (
-                      <button
-                        className="button is-danger"
-                        onClick={() => onLeaveGroup(group.id)}
-                      >
-                        Leave
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+            {groups?.map((group, index) => (
+              <GroupDisplay
+                key={index}
+                group={group}
+                onCopyGroupUrl={onCopyGroupUrl}
+                onManageGroup={onManageGroup}
+                onLeaveGroup={onLeaveGroup}
+                user={user}
+              />
+            ))}
           </tbody>
         </table>
       </section>
