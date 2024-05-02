@@ -98,7 +98,7 @@ const Group = ({ user }) => {
 
   const onCopyGroupUrl = async (groupId) => {
     const baseUrl = window.location.origin;  
-    const groupUrl = `${baseUrl}/where2go/src/pages/group/${groupId}/index.js`;
+    const groupUrl = `${baseUrl}/where2go/src/pages/group/${groupId}.js`;
   
     try {
       await navigator.clipboard.writeText(groupUrl);
