@@ -69,14 +69,17 @@ import { useRouter } from 'next/router';
 
 const EventPage = () => {
   const router = useRouter();
-  const { code_event } = router.query;
+  const { group_event } = router.query;
 
   return (
     <div>
-      <h1>Event: {code_event}</h1>
-      <p>Details about event {code_event}...</p>
+      <h1>Event: {group_event}</h1>
+      <p>Details about event {group_event}</p>
     </div>
   );
 };
 
 export default EventPage;
+
+
+
