@@ -53,9 +53,12 @@ export default function Home(props) {
             <code className={styles.code}>src/pages/index.js</code>
           </p>
         </div> */}
-        {/* <section class="hero is-medium"> */}
-        <section class="hero is-medium" style={{
-          // backgroundImage: "url('/assets/background.jpeg')",
+
+        <section className="hero is-medium" style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
           backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/background3.jpeg')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -63,19 +66,39 @@ export default function Home(props) {
           width: '100%',
           minHeight: '100vh'
         }}>
-          <div class="hero-body">
-            <div class="container has-text-centered">
-              <h1 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} class="title is-1 has-text-white has-text-weight-bold">
-                Welcome to WHERE2GO
-              </h1>
-              <h2 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} class="subtitle is-3 has-text-white">
-                Enjoy every moment!
-              </h2>
-            </div>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%'
+          }}>
+            <h1 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} className="title is-1 has-text-white has-text-weight-bold">
+              Welcome to WHERE2GO
+            </h1>
+            <h2 style={{ textShadow: "2px 2px 4px rgba(0,0,0,0.6)" }} className="subtitle is-3 has-text-white">
+              Enjoy every moment!
+            </h2>
           </div>
         </section>
 
-        <section>
+
+        <section style={{
+          backgroundImage: "url('/assets/info.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          width: '100%',
+          minHeight: '100vh'  // Adjust the height as needed
+        }}>
+          <div style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            {/* placeholder */}
+          </div>
+        </section>
+
+
+        <section style={{ paddingTop: '50px' }}>
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 class="title is-3 has-text-black">
@@ -95,7 +118,7 @@ export default function Home(props) {
         </section>
 
         {/* <PostsList /> */}
-      </main>
+      </main >
     </>
   );
 }
