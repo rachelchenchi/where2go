@@ -325,3 +325,30 @@ export const updateGroup = async (groupId, updatedData) => {
     console.error("Error deleting member from group:", e);
   }
 };
+
+// Leave Group if user is a member of the group
+export const leaveGroup = async (groupId, userId) => {
+  console.log("GroupId:", groupId);  // Check if groupId is valid
+  console.log("UserId:", userId);    // Check if userId is valid
+  try {
+    const groupRef = doc(db, "groups", groupId);
+    const groupDoc = await getDoc(groupRef);
+    
+    if (groupDoc.exists()) {
+      // Retrieve the current members and member IDs from the group document
+      const { members, membersId } = groupDoc.data();
+
+      // Filter out the leaving user from both arrays
+      const updatedMembers = members.filter(member => member.userId !== userId);
+      const updatedMembersId = membersId.filter(memberId => memberId !== userId);
+
+      // Update the group's 'members' and 'membersId' fields in Firestore
+      await updateDoc(groupRef, { members: updatedMembers, membersId: updatedMembersId });
+      console.log(`User ${userId} removed from group with ID ${groupId}`);
+    } else {
+      console.log("No such group exists.");
+    }
+  } catch (error) {
+    console.error("Error removing user from group:", error);
+  }
+};

@@ -1,16 +1,20 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import EditGroupModal from "../../components/PopUp/EditGroup";
 
-import GroupDisplay from "../../components/groups/GroupDisplay";
 import * as db from "../../database";
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Link from "next/link";
 
 const Group = ({ user }) => {
   const [groups, setGroups] = useState([]);
   const router = useRouter();
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editGroup, setEditGroup] = useState(null);
 
   const [groupUrl, setGroupUrl] = useState("");
   const [groupName, setGroupName] = useState("");
@@ -79,17 +83,19 @@ const Group = ({ user }) => {
       const groupData = await db.getGroup(groupId);
 
       // check if current user is already a member:
-      if (groupData.members.some(member => member.userId === user.uid)) {
+      if (groupData.members.some((member) => member.userId === user.uid)) {
         console.log("User already a member of the group.");
         alert("You are already a member of the group.");
         return;
       }
+
       // add a member in members array with
       const newMember = {
         userName: user.displayName,
         userId: user.uid,
         role: "member",
       };
+
       // add user.uid to membersId array, the rest are the same
       const updatedMembers = [...groupData.members, newMember];
       const updatedMembersId = [...groupData.membersId, user.uid];
@@ -136,7 +142,24 @@ const Group = ({ user }) => {
     setIsEditModalOpen(true);
   };
 
-
+  const onLeaveGroup = async (group) => {
+    // Ask user to confirm if they really want to leave the group
+    const userConfirmed = window.confirm("Are you sure you want to leave the group?");
+    
+    if (userConfirmed) {
+      try {
+        await db.leaveGroup(group.id, user.uid);
+        console.log('You have left the group.'); 
+        await fetchGroups();  
+      } catch (error) {
+        console.error('Error leaving group:', error);
+        alert('Failed to leave the group.');  // Notify user about the error
+      }
+    } else {
+      console.log("User decided not to leave the group.");
+    }
+  };
+  
 
   return (
     <>
@@ -221,6 +244,23 @@ const Group = ({ user }) => {
             </form>
           </div>
         </div>
+
+        {/* <div>
+                    <AddPlaceModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onPlaceAdded={handlePlaceAdded}
+                    /></div>
+                <div>
+                    {isEditModalOpen && (
+                        <EditPlaceModal
+                            isOpen={isEditModalOpen}
+                            onClose={() => setIsEditModalOpen(false)}
+                            place={editPlace}
+                            onPlaceUpdated={handlePlaceUpdated}
+                        />
+                    )}
+                </div> */}
       </section>
       <section className="section">
         <div className="title is-3">View Active Groups</div>
@@ -234,16 +274,63 @@ const Group = ({ user }) => {
             {/* <th>Delete?</th> */}
           </thead>
           <tbody>
-            {groups?.map((group, index) => (
-              <GroupDisplay
-                key={index}
-                group={group}
-                onCopyGroupUrl={onCopyGroupUrl}
-                onManageGroup={onManageGroup}
-                // onLeaveGroup={onLeaveGroup}
-                user={user}
-              />
-            ))}
+            {groups?.map((group, index) => {
+              return (
+                <tr key={index}>
+                  <td>
+                    <Link href={`/group/${group.id}`}>{group.groupName}</Link>
+                  </td>
+                  <td>
+                    {group.members.map((member, index) => {
+                      return member.role === "owner" ? member.userName : "";
+                    })}
+                  </td>
+                  <td>
+                    {group.members.map((member) => member.userName).join(", ")}
+                  </td>
+                  <td>
+                    {new Date(group.startDate).toLocaleDateString() ===
+                    new Date(group.endDate).toLocaleDateString()
+                      ? new Date(group.startDate).toLocaleDateString()
+                      : `${new Date(
+                          group.startDate
+                        ).toLocaleDateString()} - ${new Date(
+                          group.endDate
+                        ).toLocaleDateString()}`}
+                  </td>
+                  <td>
+                    {group.createdAt
+                      ? new Date(group.createdAt).toLocaleDateString()
+                      : "No date"}
+                  </td>
+                  <td>
+                    <button
+                      className="button is-info"
+                      onClick={() => onCopyGroupUrl(group.id)}
+                    >
+                      Copy URL
+                    </button>
+                  </td>
+                  <td>
+                    {group.ownerId === user.uid ? (
+                      <button
+                        className="button is-primary"
+                        onClick={() => onManageGroup(group.id)}
+                      >
+                        Manage
+                      </button>
+                    ) : (
+                      <button
+                        className="button is-danger"
+                        onClick={() => onLeaveGroup(group)}
+                      >
+                        Leave
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </section>
