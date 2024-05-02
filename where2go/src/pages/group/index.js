@@ -11,6 +11,7 @@ import Link from "next/link";
 
 const Group = ({ user }) => {
   const [groups, setGroups] = useState([]);
+  const router = useRouter()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
