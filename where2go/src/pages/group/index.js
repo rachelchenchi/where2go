@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import EditGroupModal from "../../components/PopUp/EditGroup";
 import DeleteGroupModal from "../../components/PopUp/DeleteGroup";
-import * as db from "../../database_zx";
+import * as db from "../../database";
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Link from "next/link";
 
 const Group = ({ user }) => {
   const [groups, setGroups] = useState([]);
-  const router = useRouter();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -71,18 +71,38 @@ const Group = ({ user }) => {
   const handleGroupJoined = async (event) => {
     // setGroups((prevGroups) => [...prevGroups, newgroup]);
     event.preventDefault();
-    // try {
-    //   const currentUser = getAuth(firebaseApp).currentUser;
-    //   const userId = currentUser ? currentUser.uid : null;
+    try {
+      // parse the url for groupId:
+      // `${baseUrl}/where2go/src/pages/group/${groupId}.js`;
+      const pathname = new URL(groupUrl).pathname;
+      const segments = pathname.split("/");
+      const groupId = segments[segments.length - 1];
 
-    //   const groupData = {
-    //     groupName: groupName,
-    //     owner: userId
+      console.log("Parsing groupId: ", groupId);
 
-    //   }
-    // } catch (error) {
-    //   console.error('Error creating group:', error);
-    // }
+      const groupData = await db.getGroup(groupId);
+
+      // add a member in members array with
+      const newMember = {
+        userName: user.displayName,
+        userId: user.uid,
+        role: "member",
+      };
+      // add user.uid to membersId array, the rest are the same
+      const updatedMembers = [...groupData.members, newMember];
+      const updatedMembersId = [...groupData.membersId, user.uid];
+
+      const updatedData = {
+        ...groupData,
+        members: updatedMembers,
+        membersId: updatedMembersId,
+      };
+      await db.updateGroup(groupId, updatedData);
+      console.log("Group joined successfully");
+      await fetchGroups();
+    } catch (error) {
+      console.error("Error joining group:", error);
+    }
   };
 
   const handleDeleteGroup = async (groupId) => {
@@ -97,18 +117,17 @@ const Group = ({ user }) => {
   };
 
   const onCopyGroupUrl = async (groupId) => {
-    const baseUrl = window.location.origin;  
-    const groupUrl = `${baseUrl}/where2go/src/pages/group/${groupId}.js`;
-  
+    const baseUrl = window.location.origin;
+    const groupUrl = `${baseUrl}/where2go/src/pages/group/${groupId}`;
+
     try {
       await navigator.clipboard.writeText(groupUrl);
-      alert('URL copied to clipboard!');  
+      alert("URL copied to clipboard!");
     } catch (err) {
-      console.error('Failed to copy URL: ', err);
-      alert('Failed to copy URL'); 
+      console.error("Failed to copy URL: ", err);
+      alert("Failed to copy URL");
     }
-  }
-  
+  };
 
   const onManageGroup = (group) => {
     setEditGroup(group);
@@ -246,12 +265,11 @@ const Group = ({ user }) => {
             {/* <th>Delete?</th> */}
           </thead>
           <tbody>
-            {groups.map((group, index) => {
+            {groups?.map((group, index) => {
               return (
                 <tr key={index}>
                   <td>
-                    {/* <Link href={`/app/${group.id}`}>{group.name}</Link> */}
-                    {group.groupName}
+                    <Link href={`/group/${group.id}`}>{group.groupName}</Link>
                   </td>
                   <td>
                     {group.members.map((member, index) => {
@@ -259,9 +277,7 @@ const Group = ({ user }) => {
                     })}
                   </td>
                   <td>
-                    {group.members.map((member, index) => {
-                      return member.userName;
-                    })}
+                    {group.members.map((member) => member.userName).join(", ")}
                   </td>
                   <td>
                     {new Date(group.startDate).toLocaleDateString() ===
