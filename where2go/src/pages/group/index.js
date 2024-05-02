@@ -114,14 +114,33 @@ const Group = ({ user }) => {
     }
   };
 
-  const handleDeleteGroup = async (groupId) => {
+  const handleGroupDeleted = async (group) => {
+    const userConfirmed = window.confirm(
+      "Are you sure you want to delete the group?"
+    );
+
+    if (userConfirmed) {
+      try {
+        await db.deleteGroup(group.id, user.uid);
+        console.log("You have deleted the group.");
+        await fetchGroups();
+      } catch (error) {
+        console.error("Error deleting group:", error);
+        alert("Failed to delete the group."); // Notify user about the error
+      }
+    } else {
+      console.log("User decided not to delete the group.");
+    }
+  };
+
+  const handleGroupUpdated = async (groupId, updatedData) => {
     try {
-      await db.deleteGroup(groupId);
-      setGroups((prevGroups) =>
-        prevGroups.filter((allgroups) => allgroups.id !== groupId)
-      );
+      await db.updateGroup(groupId, updatedData);
+      console.log("Group updated successfully");
+      await fetchGroups();
     } catch (error) {
-      console.error("Error deleting group:", error);
+      console.error("Error updating group:", error);
+      alert("Failed to delete the group."); // Notify user about the error
     }
   };
 
@@ -253,7 +272,8 @@ const Group = ({ user }) => {
               isOpen={isEditModalOpen}
               onClose={() => setIsEditModalOpen(false)}
               group={editGroup}
-              onGroupUpdated={handleDeleteGroup}
+              onGroupUpdated={handleGroupUpdated}
+              onDeleteGroup={handleGroupDeleted}
             />
           )}
         </div>
@@ -283,8 +303,8 @@ const Group = ({ user }) => {
                   </td>
                   <td>
                     {group.members
-                      .filter((member) => member.role === "member") 
-                      .map((member) => member.userName) 
+                      .filter((member) => member.role === "member")
+                      .map((member) => member.userName)
                       .join(", ")}
                   </td>
                   <td>
@@ -314,7 +334,7 @@ const Group = ({ user }) => {
                     {group.ownerId === user.uid ? (
                       <button
                         className="button is-primary"
-                        onClick={() => onManageGroup(group.id)}
+                        onClick={() => onManageGroup(group)}
                       >
                         Manage
                       </button>
