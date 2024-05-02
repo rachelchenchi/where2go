@@ -37,7 +37,17 @@ const PlaceDisplay = ({ place, onDelete, onEdit, showButtons = true }) => {
             <div style={{ marginLeft: "20px" }} className="starability-result" data-rating={place.rating} aria-label={`Rating: ${place.rating} out of 5.`}>
                 Rating: {place.rating}
             </div>
-            <p>Visit Frequency: {place.visitFrequency}</p>
+            <p>Visit Frequency: <i>{place.visitFrequency}</i></p>
+            {showButtons && (
+                <p>Publish to Community:
+                    <input
+                        type="checkbox"
+                        checked={place.publishToCommunity || false}
+                        disabled={true}
+                        style={{ marginLeft: "10px", width: "20px", height: "20px", accentColor: "#00BFFF" }}
+                    />
+                </p>
+            )}
             {showButtons && (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <button style={{ width: '100px', margin: "5px 10px", marginBottom: "10px" }} class="button is-danger" onClick={() => onDelete(place.id)}>Delete</button>

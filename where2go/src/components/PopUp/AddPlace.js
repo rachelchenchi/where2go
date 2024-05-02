@@ -166,7 +166,7 @@ const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
                         <input
                             className={styles.input}
                             type="text"
-                            placeholder="Enter Yelp's URL"
+                            placeholder="Please enter a valid Yelp's URL"
                             value={yelpUrl}
                             onChange={(e) => setYelpUrl(e.target.value)}
                         />
@@ -252,8 +252,8 @@ const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
                             onChange={(e) => setVisitFrequency(e.target.value)}
                         >
                             <option value="never">Never</option>
-                            <option value="0-2 times">1-3 times</option>
-                            <option value="more than 2 times">More than 3 times!</option>
+                            <option value="1-3 times">1-3 times</option>
+                            <option value="more than 3 times">More than 3 times!</option>
                         </select>
                     </div>
                     <div className={styles.field}>
