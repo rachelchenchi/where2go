@@ -126,9 +126,9 @@ export const getCommunityPlaces = async () => {
   return allPlaces.sort(() => 0.5 - Math.random()).slice(0, 3);
 };
 
-//////////////////////////
-// group - vote functions
-//////////////////////////
+///////////////////////////////
+// group - event page functions
+///////////////////////////////
 
 // Get saved places from private space
 export const getSavedPlaces = async (userId) => {
