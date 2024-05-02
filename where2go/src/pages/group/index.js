@@ -1,9 +1,8 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import EditGroupModal from "../../components/PopUp/EditGroup";
-import DeleteGroupModal from "../../components/PopUp/DeleteGroup";
-import GroupDisplay from "../../components/groups/GroupDisplay";  
+
+import GroupDisplay from "../../components/groups/GroupDisplay";
 import * as db from "../../database";
 import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
@@ -12,10 +11,6 @@ import "react-datepicker/dist/react-datepicker.css";
 const Group = ({ user }) => {
   const [groups, setGroups] = useState([]);
   const router = useRouter();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editGroup, setEditGroup] = useState(null);
 
   const [groupUrl, setGroupUrl] = useState("");
   const [groupName, setGroupName] = useState("");
@@ -119,7 +114,7 @@ const Group = ({ user }) => {
 
   const onCopyGroupUrl = async (groupId) => {
     const baseUrl = window.location.origin;
-    const groupUrl = `${baseUrl}/where2go/src/pages/group/${groupId}`;
+    const groupUrl = `${baseUrl}/group/${groupId}`;
 
     try {
       await navigator.clipboard.writeText(groupUrl);
@@ -135,13 +130,7 @@ const Group = ({ user }) => {
     setIsEditModalOpen(true);
   };
 
-  const onLeaveGroup = (groupId, updatedData) => {
-    setPlaces((prevGroups) =>
-      prevGroups.map((group) => {
-        return group.id === groupId ? { ...group, ...updatedData } : group;
-      })
-    );
-  };
+
 
   return (
     <>
@@ -226,33 +215,6 @@ const Group = ({ user }) => {
             </form>
           </div>
         </div>
-
-        {/* <div>
-                    <AddPlaceModal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onPlaceAdded={handlePlaceAdded}
-                    /></div>
-                <div>
-                    {isEditModalOpen && (
-                        <EditPlaceModal
-                            isOpen={isEditModalOpen}
-                            onClose={() => setIsEditModalOpen(false)}
-                            place={editPlace}
-                            onPlaceUpdated={handlePlaceUpdated}
-                        />
-                    )}
-                </div> */}
-        {/* <div>
-          {groups.map((group, index) => (
-            <GroupDisplay
-              key={index}
-              place={place}
-              onDelete={handleDeletePlace}
-              onEdit={() => handleEditPlace(place)}
-            />
-          ))}
-        </div> */}
       </section>
       <section className="section">
         <div className="title is-3">View Active Groups</div>
@@ -272,7 +234,7 @@ const Group = ({ user }) => {
                 group={group}
                 onCopyGroupUrl={onCopyGroupUrl}
                 onManageGroup={onManageGroup}
-                onLeaveGroup={onLeaveGroup}
+                // onLeaveGroup={onLeaveGroup}
                 user={user}
               />
             ))}
