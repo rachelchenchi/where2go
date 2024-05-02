@@ -4,36 +4,26 @@ import Dropdown from '@/components/groupVote/dropdown';
 import * as db from '@/database'
 import { useRouter } from 'next/router';
 
-const GroupVote = () => {
+
+const GroupVote = ({ user }) => {
     const router = useRouter();
     const { code_event } = router.query;
     const [places, setPlaces] = useState([]);
-    const [selectedPlace, setSelectedPlace] = useState('');
 
-    // fetch function to get saved places from the database
     useEffect(() => {
+        if (!user || !user.uid) {
+            router.push('/login'); // Adjust the path as needed
+            return;
+        }
+
         const fetchPlaces = async () => {
-            // Replace this with your actual data fetching logic from the database
-            const data = await db.getPlacesByGroup(code_event);
-            setPlaces(data);
+            const fetchedPlaces = await db.getSavedPlaces(user.uid);
+            setPlaces(fetchedPlaces);
         };
 
-        if (code_event) {
-            fetchPlaces();
-        }
-    }, [code_event]);
+        fetchPlaces();
+    }, [user, router]);
 
-    // useEffect(() => {
-    //     const fetchPlaces = async () => {
-    //         if (user) {
-    //             const fetchedPlaces = await db.getUserPlaces(user.uid);
-    //             setPlaces(fetchedPlaces);
-    //         } else {
-    //             setPlaces([]);
-    //         }
-    //     };
-    //     fetchPlaces();
-    // }, [user]);
 
     const handleVote = async (place) => {
         // Implement voting logic here
@@ -48,8 +38,8 @@ const GroupVote = () => {
                 <div>
                     <Dropdown
                         options={places}
-                        value={selectedPlace.name}
-                        onChange={(selected) => setSelectedPlace(selected)}
+                        value={selectedPlace}
+                        onChange={(e) => setSelectedPlace(e.target.value)}
                         placeholder="Select a place"
                     />
 
@@ -60,8 +50,8 @@ const GroupVote = () => {
             <div>
                 <h2>Pick the place to vote:</h2>
                 <ul>
-                    {places.map((place, index) => (
-                        <li key={index}>
+                    {places.map((place) => (
+                        <li key={place.id}>
                             {place.name} - <button onClick={() => handleVote(place)}>Vote</button>
                         </li>
                     ))}

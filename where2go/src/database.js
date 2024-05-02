@@ -121,13 +121,20 @@ export const getCommunityPlaces = async () => {
 
 // Get saved places from private space
 export const getSavedPlaces = async (userId) => {
-    const placesRef = collection(db, 'users', userId, 'places');
-    const querySnapshot = await getDocs(placesRef);
-    return querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    }));
+  try {
+      if (!userId) throw new Error("need a valid user ID");
+      const placesRef = collection(db, 'users', userId, 'places');
+      const querySnapshot = await getDocs(placesRef);
+      return querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+      }));
+  } catch (error) {
+      console.error("Failed to fetch places:", error);
+      return [];
+  }
 };
+
 
 
 // Delete a place from Voting in a group/event
