@@ -96,10 +96,19 @@ const Group = ({ user }) => {
     }
   };
 
-  const onCopyGroupUrl = (group) => {
-    setEditGroup(group);
-    setIsEditModalOpen(true);
-  };
+  const onCopyGroupUrl = async (groupId) => {
+    const baseUrl = window.location.origin;  
+    const groupUrl = `${baseUrl}/where2go/src/pages/group/${groupId}/index.js`;
+  
+    try {
+      await navigator.clipboard.writeText(groupUrl);
+      alert('URL copied to clipboard!');  
+    } catch (err) {
+      console.error('Failed to copy URL: ', err);
+      alert('Failed to copy URL'); 
+    }
+  }
+  
 
   const onManageGroup = (group) => {
     setEditGroup(group);
@@ -182,8 +191,9 @@ const Group = ({ user }) => {
                           }
                           setEndDate(date.valueOf());
                         }}
+                        minDate={startDate} // Disable all dates before the start date
                       />
-                      <p class="help is-success">Choose an end date</p>
+                      <p className="help is-success">Choose an end date</p>
                     </div>
                   </div>
                 </p>
@@ -226,7 +236,7 @@ const Group = ({ user }) => {
       </section>
       <section className="section">
         <div className="title is-3">View Active Groups</div>
-        <table className="table" >
+        <table className="table">
           <thead>
             <th>Group</th>
             <th>Owner</th>
