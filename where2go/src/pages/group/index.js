@@ -1,13 +1,14 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/router";
+import Link from "next/link";
+// import { getAuth, onAuthStateChanged } from "firebase/auth";
+import * as db from "../../database";
+
 import EditGroupModal from "../../components/PopUp/EditGroup";
 
-import * as db from "../../database";
-import { useRouter } from "next/router";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import Link from "next/link";
 
 const Group = ({ user }) => {
   const [groups, setGroups] = useState([]);
@@ -144,22 +145,23 @@ const Group = ({ user }) => {
 
   const onLeaveGroup = async (group) => {
     // Ask user to confirm if they really want to leave the group
-    const userConfirmed = window.confirm("Are you sure you want to leave the group?");
-    
+    const userConfirmed = window.confirm(
+      "Are you sure you want to leave the group?"
+    );
+
     if (userConfirmed) {
       try {
         await db.leaveGroup(group.id, user.uid);
-        console.log('You have left the group.'); 
-        await fetchGroups();  
+        console.log("You have left the group.");
+        await fetchGroups();
       } catch (error) {
-        console.error('Error leaving group:', error);
-        alert('Failed to leave the group.');  // Notify user about the error
+        console.error("Error leaving group:", error);
+        alert("Failed to leave the group."); // Notify user about the error
       }
     } else {
       console.log("User decided not to leave the group.");
     }
   };
-  
 
   return (
     <>
@@ -245,22 +247,16 @@ const Group = ({ user }) => {
           </div>
         </div>
 
-        {/* <div>
-                    <AddPlaceModal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onPlaceAdded={handlePlaceAdded}
-                    /></div>
-                <div>
-                    {isEditModalOpen && (
-                        <EditPlaceModal
-                            isOpen={isEditModalOpen}
-                            onClose={() => setIsEditModalOpen(false)}
-                            place={editPlace}
-                            onPlaceUpdated={handlePlaceUpdated}
-                        />
-                    )}
-                </div> */}
+        <div>
+          {isEditModalOpen && (
+            <EditGroupModal
+              isOpen={isEditModalOpen}
+              onClose={() => setIsEditModalOpen(false)}
+              group={editGroup}
+              onGroupUpdated={handleDeleteGroup}
+            />
+          )}
+        </div>
       </section>
       <section className="section">
         <div className="title is-3">View Active Groups</div>
@@ -286,7 +282,10 @@ const Group = ({ user }) => {
                     })}
                   </td>
                   <td>
-                    {group.members.map((member) => member.userName).join(", ")}
+                    {group.members
+                      .filter((member) => member.role === "member") 
+                      .map((member) => member.userName) 
+                      .join(", ")}
                   </td>
                   <td>
                     {new Date(group.startDate).toLocaleDateString() ===
