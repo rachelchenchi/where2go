@@ -1,4 +1,5 @@
 import Head from "next/head";
+import firebaseApp from "../../firebase";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 // import EditGroupModal from "../../components/PopUp/EditGroup";
@@ -10,16 +11,17 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Group = ({ user }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [groups, setGroups] = useState([]);
   const router = useRouter();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editGroup, setEditGroup] = useState(null);
 
   const [groupUrl, setGroupUrl] = useState("");
   const [groupName, setGroupName] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState();
+  const [endDate, setEndDate] = useState();
 
   useEffect(() => {
     console.log("User state changed");
@@ -32,7 +34,7 @@ const Group = ({ user }) => {
   useEffect(() => {
     const fetchGroups = async () => {
       if (user) {
-        const fetchedGroups = await db.getGroups(user.uid);
+        const fetchedGroups = await db.getAllGroups(user.uid);
         setGroups(fetchedGroups);
       } else {
         setGroups([]);
@@ -41,8 +43,50 @@ const Group = ({ user }) => {
     fetchGroups();
   }, [user]);
 
-  const handleGroupCreated = (newgroup) => {
-    setGroups((prevGroups) => [...prevGroups, newgroup]);
+  const handleGroupCreated = async (event) => {
+    event.preventDefault();
+    try {
+      const currentUser = getAuth(firebaseApp).currentUser;
+      const userId = currentUser ? currentUser.uid : null;
+      const userName = currentUser ? currentUser.displayName : null;
+
+      const member = {
+        userName: userName,
+        userId: userId,
+        role: "owner",
+      };
+      const groupData = {
+        groupName: groupName,
+        startDate: startDate,
+        endDate: endDate,
+        ownerId: userId,
+        membersId: [userId],
+        members: [member],
+        createdAt: Date.now(),
+      };
+      await db.createGroup(groupData);
+      console.log("Group created successfully");
+    } catch (error) {
+      console.error("Error creating group:", error);
+    }
+    // setGroups((prevGroups) => [...prevGroups, newgroup]);
+  };
+
+  const handleGroupJoined = async (event) => {
+    // setGroups((prevGroups) => [...prevGroups, newgroup]);
+    event.preventDefault();
+    // try {
+    //   const currentUser = getAuth(firebaseApp).currentUser;
+    //   const userId = currentUser ? currentUser.uid : null;
+
+    //   const groupData = {
+    //     groupName: groupName,
+    //     owner: userId
+
+    //   }
+    // } catch (error) {
+    //   console.error('Error creating group:', error);
+    // }
   };
 
   const handleDeleteGroup = async (groupId) => {
@@ -69,10 +113,6 @@ const Group = ({ user }) => {
     );
   };
 
-  const handleGroupJoined = (newgroup) => {
-    setGroups((prevGroups) => [...prevGroups, newgroup]);
-  };
-
   return (
     <>
       <Head>
@@ -84,14 +124,15 @@ const Group = ({ user }) => {
         <div className="columns">
           <div className="column is-one-third">
             <h1 className="title">Join Existing Group</h1>
-            <form onSubmit={(event) => handleGroupJoined(event)}>
+            <form onSubmit={handleGroupJoined}>
               <div className="field has-addons">
                 <p className="control">
                   <input
                     className="input"
                     type="text"
-                    name="classCodeInput"
                     placeholder="Group Url"
+                    value={groupUrl}
+                    onChange={(e) => setGroupUrl(e.target.value)}
                   />
                 </p>
                 <p className="control">
@@ -103,15 +144,16 @@ const Group = ({ user }) => {
           </div>
           <div className="column is">
             <h1 className="title">Plan a New Event</h1>
-            <form onSubmit={(event) => handleGroupCreated(event)}>
+            <form onSubmit={handleGroupCreated}>
               <div className="field">
                 <label class="label">What is this group about?</label>
                 <p className="control">
                   <input
                     className="input"
                     type="text"
-                    name="classCodeInput"
+                    value={groupName}
                     placeholder="Enter Group Name"
+                    onChange={(e) => setGroupName(e.target.value)}
                   />
                 </p>
               </div>
@@ -122,14 +164,14 @@ const Group = ({ user }) => {
                     <div className="column">
                       <DatePicker
                         selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        onChange={(date) => setStartDate(date.valueOf())}
                       />
                       <p class="help is-success">Choose a start date</p>
                     </div>
                     <div className="column">
                       <DatePicker
                         selected={endDate}
-                        onChange={(date) => setEndDate(date)}
+                        onChange={(date) => setEndDate(date.valueOf())}
                       />
                       <p class="help is-success">Choose an end date</p>
                     </div>
@@ -178,26 +220,37 @@ const Group = ({ user }) => {
           <thead>
             <th>Group</th>
             <th>Owner</th>
-            <th>Member</th>
+            <th>Members</th>
             <th>Event Date</th>
             <th>Date created</th>
+            <th>Delete?</th>
           </thead>
           <tbody>
             {groups.map((group, index) => {
               return (
                 <tr key={index}>
                   <td>
-                    <Link href={`/app/${group.id}`}>{group.name}</Link>
+                    {/* <Link href={`/app/${group.id}`}>{group.name}</Link> */}
+                    {group.groupName}
                   </td>
                   <td>
-                    <p>{group.owner}</p>
+                    {group.members.map((member, index) => {
+                      return member.role === 'owner' ? member.userName : '';
+                    })}
                   </td>
                   <td>
-                    <p>{group.member}</p>
+                    {group.members.map((member, index) => {
+                      return member.userName;
+                    })}
+                  </td>
+                  <td>
+                    {new Date(group.startDate).toLocaleDateString() === new Date(group.endDate).toLocaleDateString()
+                      ? new Date(group.startDate).toLocaleDateString()
+                      : `${new Date(group.startDate).toLocaleDateString()} - ${new Date(group.endDate).toLocaleDateString()}`}
                   </td>
                   <td>
                     {group.createdAt
-                      ? new Date(group.createdAt).toString()
+                      ? new Date(group.createdAt).toLocaleDateString()
                       : "No date"}
                   </td>
                 </tr>
