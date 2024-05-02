@@ -113,7 +113,13 @@ export const getCommunityPlaces = async () => {
     return allPlaces.sort(() => 0.5 - Math.random()).slice(0, 3);
 }
 
-//group functions
+
+
+//////////////////////////
+// group - vote functions
+//////////////////////////
+
+// Get saved places from private space
 export const getSavedPlaces = async (userId) => {
     const placesRef = collection(db, 'users', userId, 'places');
     const querySnapshot = await getDocs(placesRef);
@@ -122,3 +128,86 @@ export const getSavedPlaces = async (userId) => {
         ...doc.data()
     }));
 };
+
+
+// Delete a place from Voting in a group/event
+export const removePlaceFromVote = async (groupId, eventId, placeId) => {
+    try {
+      const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
+      const eventSnap = await getDoc(eventRef);
+      if (eventSnap.exists()) {
+        const updatedPlaces = eventSnap.data().votingPlaces.filter(place => place.id !== placeId);
+        await updateDoc(eventRef, { votingPlaces: updatedPlaces });
+        console.log("Place removed from voting successfully");
+      } else {
+        console.error("Event does not exist");
+      }
+    } catch (e) {
+      console.error("Error removing place from voting:", e);
+    }
+  };
+
+
+  // Update the vote
+export const updateVote = async (groupId, eventId, placeId, voteChange) => {
+    try {
+      const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
+      const eventSnap = await getDoc(eventRef);
+      if (eventSnap.exists()) {
+        const updatedPlaces = eventSnap.data().votingPlaces.map(place => {
+          if (place.id === placeId) {
+            return { ...place, votes: place.votes + voteChange };
+          }
+          return place;
+        });
+        await updateDoc(eventRef, { votingPlaces: updatedPlaces });
+        console.log("Vote updated successfully for place in event");
+      } else {
+        console.error("Event does not exist");
+      }
+    } catch (e) {
+      console.error("Error updating votes:", e);
+    }
+  };  
+
+// Update votes for a place in an event
+export const updateVotes = async (groupId, eventId, placeId, incrementValue) => {
+    try {
+      const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
+      const eventSnap = await getDoc(eventRef);
+      if (eventSnap.exists()) {
+        const places = eventSnap.data().votingPlaces.map(place => {
+          if (place.id === placeId) {
+            return { ...place, votes: place.votes + incrementValue };
+          }
+          return place;
+        });
+        await updateDoc(eventRef, { votingPlaces: places });
+        console.log("Votes updated for place in event.");
+      } else {
+        console.error("Event does not exist");
+      }
+    } catch (e) {
+      console.error("Error updating votes:", e);
+    }
+  };
+
+  // Add a place from Private Space to a Group/Event for voting
+export const addPlaceToVote = async (groupId, eventId, placeId, userId) => {
+    try {
+      const placeRef = doc(db, "privateSpaces", userId, "places", placeId);
+      const placeSnap = await getDoc(placeRef);
+      if (placeSnap.exists()) {
+        const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
+        const placeData = { ...placeSnap.data(), votes: 0 };
+        await updateDoc(eventRef, {
+          votingPlaces: firebase.firestore.FieldValue.arrayUnion(placeData)
+        });
+        console.log("Place added to voting in event with ID: ", eventId);
+      } else {
+        console.error("Place does not exist in Private Space");
+      }
+    } catch (e) {
+      console.error("Error adding place to voting:", e);
+    }
+  };
