@@ -331,7 +331,7 @@ const Group = ({ user }) => {
                     </button>
                   </td>
                   <td>
-                    {group.ownerId === user.uid ? (
+                    {group.ownerId === user?.uid ? (
                       <button
                         className="button is-primary"
                         onClick={() => onManageGroup(group)}
