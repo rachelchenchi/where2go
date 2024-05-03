@@ -103,7 +103,7 @@ export default function Home(props) {
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 class="title is-3 has-text-black">
-                Check out what are other people' favorites!
+                Take a look at what favorites others have!
               </h1>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function Home(props) {
           </div>
           <div className="places-container">
             {places.map((place) => (
-              <PlaceDisplay className="place-display" place={place}
+              <PlaceDisplay key={place.id} className="place-display" place={place}
                 showButtons={false} />
             ))}
           </div>
