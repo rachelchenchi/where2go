@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Dropdown from '@/components/groupVote/dropdown';
 import Card from '@/components/groupVote/card';
+import PickTime from '@/components/groupVote/pickTime'
 import * as db from '@/database';
 import styles from '@/styles/GroupDetails.module.css';
 import Link from 'next/link';
@@ -112,7 +113,7 @@ const GroupDetailsPage = ({ user }) => {
 
       <div className='container'>
         <div className="columns">
-          <div className="column is-8">
+          <div className="column is-4">
             {places.length ? (
               <Dropdown
                 options={places.map(place => ({ value: place.id, label: place.name }))}
@@ -126,7 +127,12 @@ const GroupDetailsPage = ({ user }) => {
             )}
           </div>
 
+          <div className="column is-4">
+            <PickTime />
+          </div>
 
+
+          {/* <div className={styles.borderleft + " column is-4"}> */}
           <div className="column is-4">
 
             {proposals.map(proposal => (
