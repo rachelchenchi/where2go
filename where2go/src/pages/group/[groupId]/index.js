@@ -83,7 +83,7 @@ const handleDeleteProposal = async (proposalId) => {
     <div>
       <div className={styles.divWrapper + " is-flex is-flex-direction-column is-align-items-center"}>
         <div className="title has-text-centered">
-          Welcome Group: {groupDetails ? groupDetails.groupName : "Loading group details..."}
+          Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
         </div>
         <div className="mt-3">
           <Link href="/group">
