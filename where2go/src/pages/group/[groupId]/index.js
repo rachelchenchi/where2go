@@ -59,24 +59,42 @@ const GroupDetailsPage = ({ user }) => {
     }
   };
 
-const handleDeleteProposal = async (proposalId) => {
-  try {
-    await db.deleteProposal(proposalId);
-    setProposals(prevProposals => prevProposals.filter(proposal => proposal.id !== proposalId));
-  } catch (error) {
-    console.error('Error deleting proposal:', error);
-  }
-};
+  const handleDeleteProposal = async (proposalId) => {
+    try {
+      await db.deleteProposal(proposalId);
+      setProposals(prevProposals => prevProposals.filter(proposal => proposal.id !== proposalId));
+    } catch (error) {
+      console.error('Error deleting proposal:', error);
+    }
+  };
+
+
+  // const handleVote = async (proposalId) => {
+  //   try {
+  //     await db.submitVote(groupId, proposalId, user.uid);
+  //     alert('Vote submitted!');
+  //   } catch (error) {
+  //     console.error('Error submitting vote:', error);
+  //   }
+  // };
 
 
   const handleVote = async (proposalId) => {
     try {
       await db.submitVote(groupId, proposalId, user.uid);
+      setProposals(prevProposals => prevProposals.map(proposal => {
+        if (proposal.id === proposalId) {
+          return { ...proposal, votes: proposal.votes ? proposal.votes + 1 : 1 };
+        }
+        return proposal;
+      }));
       alert('Vote submitted!');
     } catch (error) {
       console.error('Error submitting vote:', error);
+      alert('Failed to submit vote');
     }
   };
+
 
 
   return (
@@ -92,38 +110,40 @@ const handleDeleteProposal = async (proposalId) => {
         </div>
       </div>
 
-      <div className="columns">
-        <div className="column is-6">
-          {places.length ? (
-            <Dropdown
-              options={places.map(place => ({ value: place.id, label: place.name }))}
-              value={selectedPlace}
-              onChange={handlePlaceSelection}
-            />
-          ) : (
-            <p className="notification is-primary">
-              No places available. Please add some places at your Private Space first
-            </p>
-          )}
+      <div className='container'>
+        <div className="columns">
+          <div className="column is-8">
+            {places.length ? (
+              <Dropdown
+                options={places.map(place => ({ value: place.id, label: place.name }))}
+                value={selectedPlace}
+                onChange={handlePlaceSelection}
+              />
+            ) : (
+              <p className="notification is-primary">
+                No places available. Please add some places at your Private Space first
+              </p>
+            )}
+          </div>
+
+
+          <div className="column is-4">
+
+            {proposals.map(proposal => (
+              <Card
+                key={proposal.id}
+                imageUrl={proposal.imageUrl}
+                yelpUrl={proposal.yelpUrl}
+                placeName={proposal.name}
+                votes={proposal.votes} // Ensure that your proposal object has a votes field
+                onVote={() => handleVote(proposal.id)}
+                onDelete={() => handleDeleteProposal(proposal.id)}
+              />
+            ))}
+
+          </div>
+
         </div>
-
-
-        <div className="column is-6">
-
-          {proposals.map(proposal => (
-            <Card
-              key={proposal.id}
-              imageUrl={proposal.imageUrl}
-              yelpUrl={proposal.yelpUrl}
-              placeName={proposal.name}
-              votes={proposal.votes} // Ensure that your proposal object has a votes field
-              onVote={() => handleVote(proposal.id)}
-              onDelete={() => handleDeleteProposal(proposal.id)}
-            />
-          ))}
-
-        </div>
-
       </div>
     </div>
   );
