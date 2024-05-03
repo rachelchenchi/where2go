@@ -1,45 +1,89 @@
+import Head from 'next/head';
+import React, { useState } from "react";
 import { GoogleMap, LoadScript, MarkerF } from "@react-google-maps/api";
-import styles from '../../styles/PlaceDisplay.module.css';
-import React, { useState } from 'react';
+import Link from "next/link";
 
 const containerStyle = {
-    width: '100%',
-    height: '400px'
+  width: "100%",
+  height: "400px",
 };
 
 const mapOptions = {
-    streetViewControl: false
+  streetViewControl: false,
 };
 
-
 const PlaceDisplay = ({ place, onDelete, onEdit, showButtons = true }) => {
-    const [showMap, setShowMap] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
-    const center = place && place.coordinates ? {
-        lat: place.coordinates.latitude,
-        lng: place.coordinates.longitude
-    } : null;
+  const center =
+    place && place.coordinates
+      ? {
+          lat: place.coordinates.latitude,
+          lng: place.coordinates.longitude,
+        }
+      : null;
 
-    const toggleMap = () => setShowMap(!showMap);
+  const toggleMap = () => setShowMap(!showMap);
 
-    return (
-        <div className={styles.placeCard}>
-            <h2>{place.name}</h2>
-            {place.imageUrl && <img src={place.imageUrl} alt={`Image of ${place.name}`} style={{ width: '100%', height: '400px', marginBottom: '10px' }} />}
-            <p>Yelp URL: <a href={place.yelpUrl} target="_blank" rel="noopener noreferrer">{place.yelpUrl}</a></p>
-            <p>Tags:<span style={{
-                backgroundColor: "rgb(230, 240, 250)",
-                marginLeft: "10px",
-                padding: "5px 20px",
-                borderRadius: "15px",
-                display: "inline-block"
-            }}> {place.tags}</span></p>
-            <div style={{ marginLeft: "20px" }} className="starability-result" data-rating={place.rating} aria-label={`Rating: ${place.rating} out of 5.`}>
-                Rating: {place.rating}
+  const getVisitFrequencyEmoji = () => {
+    if (place.visitFrequency === "never")
+      return { emoji: "⏱️", label: "Never visited" };
+    if (place.visitFrequency === "1-3 times")
+      return { emoji: "💗", label: "Visited 1-3 times" };
+    return { emoji: "🔥", label: "Visited more than 3 times" };
+  };
+
+  const visitFreq = getVisitFrequencyEmoji();
+
+  return (
+    <>
+    <Head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+      </Head>
+    <div className="column is-one-quarter">
+      <div className="card">
+        <div className="card-image">
+          <figure className="image is-1by1">
+            {place.imageUrl && (
+              <img
+                src={place.imageUrl}
+                alt={`Image of ${place.name}`}
+                // style={{ width: '100%', height: '300px', marginBottom: '10px' }}
+              />
+            )}
+          </figure>
+        </div>
+        <div className="card-content">
+          <div className="columns">
+            <div className="column">
+              <h2 className="title is-4">{place.name}</h2>
             </div>
-            <p>Visit Frequency: <i>{place.visitFrequency}</i></p>
-            {showButtons && (
-                <p>Publish to Community:
+            {showButtons &&
+            <div className="column is-multiline is-flex is-justify-content-flex-end">
+            <span title="Edit" onClick={() => onEdit(place.id)} className="icon is-small is-clickable has-text-success" style={{ marginRight: '20px' }}>
+                <i className="fas fa-edit"></i>
+            </span>
+            <span title="Delete" onClick={() => onDelete(place.id)} className="icon is-small is-clickable has-text-danger">
+                <i className="fas fa-trash-alt"></i>
+            </span>
+        </div>}
+          </div>
+          <div className="field is-grouped is-multiline">
+            {place.tags.split(",").map((tag, index) => (
+              <div className="control" key={index}>
+                <div className="tags has-addons">
+                  <span className="tag is-info">{tag.trim()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="starability-result" data-rating={place.rating} style={{ marginBottom: '20px' }}>
+            Rating: {place.rating}
+          </div>
+          <span title={visitFreq.label}>{place.visitFrequency} visited {visitFreq.emoji}</span>
+          {/* <span title="Publish to Community" className="is-size-6">📢 Open to Public</span> */}
+          {showButtons && (
+                <p>open to public?
                     <input
                         type="checkbox"
                         checked={place.publishToCommunity || false}
@@ -48,34 +92,62 @@ const PlaceDisplay = ({ place, onDelete, onEdit, showButtons = true }) => {
                     />
                 </p>
             )}
-            {showButtons && (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <button style={{ width: '100px', margin: "5px 10px", marginBottom: "10px" }} class="button is-danger" onClick={() => onDelete(place.id)}>Delete</button>
-                    <button style={{ width: '100px', margin: "5px 10px", marginBottom: "10px" }} class="button is-primary" onClick={() => onEdit(place.id)}>Edit</button>
-                    {center && <button style={{ width: '100px', margin: "5px 10px", marginBottom: "10px" }} class="button is-info" onClick={toggleMap}>Show Map</button>}
-                </div>
+        </div>
+        {showButtons && (
+          <footer className="card-footer">
+            <p className="card-footer-item">
+              <span>
+                View on{" "}
+                <a
+                  href={place.yelpUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="is-link"
+                >
+                  Yelp
+                </a>
+              </span>
+            </p>
+            {center && (
+              <p
+                className="card-footer-item is-clickable"
+                title="Show Map"
+                onClick={toggleMap}
+              >
+                Show Map
+              </p>
             )}
-            {
-                showMap && (
-                    <div className={styles.modal}>
-                        <div className={styles.modalContent}>
-                            <span className={styles.closeButton} onClick={toggleMap}>&times;</span>
-
-                            <GoogleMap
-                                mapContainerStyle={containerStyle}
-                                center={center}
-                                zoom={12}
-                                options={mapOptions}
-                            >
-                                <MarkerF position={center} />
-                            </GoogleMap>
-
-                        </div>
-                    </div>
-                )
-            }
-        </div >
-    );
+          </footer>
+        )}
+        {showMap && (
+          <div className="modal is-active">
+            <div className="modal-background" onClick={toggleMap}></div>
+            <div className="modal-card">
+              <header className="modal-card-head">
+                <p className="modal-card-title">Map View</p>
+                <button
+                  className="delete"
+                  aria-label="close"
+                  onClick={toggleMap}
+                ></button>
+              </header>
+              <section className="modal-card-body">
+                <GoogleMap
+                  mapContainerStyle={containerStyle}
+                  center={center}
+                  zoom={12}
+                  options={mapOptions}
+                >
+                  <MarkerF position={center} />
+                </GoogleMap>
+              </section>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+    </>
+  );
 };
 
 export default PlaceDisplay;

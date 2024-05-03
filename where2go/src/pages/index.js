@@ -9,6 +9,7 @@ import PostsList from "../components/PostsList";
 import React, { useState, useEffect } from 'react';
 import * as db from '../database';
 import PlaceDisplay from '../components/places/PlaceDisplay';
+import { Analytics } from "@vercel/analytics/react"
 
 
 
@@ -102,7 +103,7 @@ export default function Home(props) {
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 class="title is-3 has-text-black">
-                Check out what are other people' favorites!
+                Check out what are other people&apos; favorites!
               </h1>
             </div>
           </div>
@@ -110,8 +111,8 @@ export default function Home(props) {
             <button onClick={handleReloadPlaces} class="button is-info" style={{ fontSize: "24px", color: "white", fontWeight: "bolder" }}>&#10227;</button>
           </div>
           <div className="places-container">
-            {places.map((place) => (
-              <PlaceDisplay className="place-display" place={place}
+            {places.map((place, index) => (
+              <PlaceDisplay className="place-display" place={place} key={index}
                 showButtons={false} />
             ))}
           </div>
@@ -119,6 +120,7 @@ export default function Home(props) {
 
         {/* <PostsList /> */}
       </main >
+      <Analytics />
     </>
   );
 }

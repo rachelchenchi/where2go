@@ -162,11 +162,11 @@ const AddPlaceModal = ({ isOpen, onClose, onPlaceAdded }) => {
                 <h2>Mark a Place of Your Interest!</h2>
                 <form onSubmit={handleSubmit}>
                     <div className={styles.field}>
-                        <label>Yelp's URL</label>
+                        <label>Yelp&apos;s URL</label>
                         <input
                             className={styles.input}
                             type="text"
-                            placeholder="Please enter a valid Yelp's URL"
+                            placeholder="Please enter a valid Yelp&apos;s URL"
                             value={yelpUrl}
                             onChange={(e) => setYelpUrl(e.target.value)}
                         />
