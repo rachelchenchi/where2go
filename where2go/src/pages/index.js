@@ -9,6 +9,7 @@ import PostsList from "../components/PostsList";
 import React, { useState, useEffect } from 'react';
 import * as db from '../database';
 import PlaceDisplay from '../components/places/PlaceDisplay';
+import { Analytics } from "@vercel/analytics/react"
 
 
 
@@ -119,6 +120,7 @@ export default function Home(props) {
 
         {/* <PostsList /> */}
       </main >
+      <Analytics />
     </>
   );
 }
