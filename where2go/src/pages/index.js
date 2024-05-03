@@ -103,7 +103,7 @@ export default function Home(props) {
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 class="title is-3 has-text-black">
-                Check out what are other people&apos; favorites!
+                Check out what are other people' favorites!
               </h1>
             </div>
           </div>
@@ -111,8 +111,8 @@ export default function Home(props) {
             <button onClick={handleReloadPlaces} class="button is-info" style={{ fontSize: "24px", color: "white", fontWeight: "bolder" }}>&#10227;</button>
           </div>
           <div className="places-container">
-            {places.map((place, index) => (
-              <PlaceDisplay className="place-display" place={place} key={index}
+            {places.map((place) => (
+              <PlaceDisplay className="place-display" place={place}
                 showButtons={false} />
             ))}
           </div>

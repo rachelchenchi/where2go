@@ -91,7 +91,7 @@ const EditGroupModal = ({
               {members
                 .filter((member) => member.role === "member")
                 .map((member, index) => (
-                  <div className="control" key={index}>
+                  <div className="control">
                     <div key={member.userId} className="tags has-addons">
                       <span className="tag is-link">{member.userName}</span>
                       <a
