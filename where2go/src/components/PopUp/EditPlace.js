@@ -124,11 +124,11 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
                 <h2>Edit Place</h2>
                 <form onSubmit={handleSubmit}>
                     <div className={styles.field}>
-                        <label>Yelp's URL</label>
+                        <label>Yelp&apos;s URL</label>
                         <input
                             className={styles.input}
                             type="text"
-                            placeholder="Enter Yelp's URL"
+                            placeholder="Enter Yelp&apos;s URL"
                             value={yelpUrl}
                             onChange={(e) => setYelpUrl(e.target.value)}
                         />
