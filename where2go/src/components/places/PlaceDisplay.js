@@ -77,7 +77,7 @@ const PlaceDisplay = ({ place, onDelete, onEdit, showButtons = true }) => {
               </div>
             ))}
           </div>
-          <div className="starability-result" data-rating={place.rating}>
+          <div className="starability-result" data-rating={place.rating} style={{ marginBottom: '20px' }}>
             Rating: {place.rating}
           </div>
           <span title={visitFreq.label}>{place.visitFrequency} visited {visitFreq.emoji}</span>
