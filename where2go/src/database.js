@@ -130,110 +130,60 @@ export const getCommunityPlaces = async () => {
 // group - event page functions
 ///////////////////////////////
 
-// Get saved places from private space
-export const getSavedPlaces = async (userId) => {
+
+export const addProposal = async (proposalData) => {
   try {
-      if (!userId) throw new Error("need a valid user ID");
-      const placesRef = collection(db, 'users', userId, 'places');
-      const querySnapshot = await getDocs(placesRef);
-      return querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-      }));
+    const proposalsCollection = collection(db, "proposals");
+    const docRef = await addDoc(proposalsCollection, proposalData);
+    console.log("Proposal added with ID: ", docRef.id);
+    return docRef.id;
   } catch (error) {
-      console.error("Failed to fetch places:", error);
-      return [];
+    console.error("Error adding proposal: ", error);
+    throw new Error("Failed to add proposal");
   }
 };
 
 
-// Delete a place from Voting in a group/event
-export const removePlaceFromVote = async (groupId, eventId, placeId) => {
+export const fetchProposalsByGroup = async (groupId) => {
   try {
-    const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
-    const eventSnap = await getDoc(eventRef);
-    if (eventSnap.exists()) {
-      const updatedPlaces = eventSnap
-        .data()
-        .votingPlaces.filter((place) => place.id !== placeId);
-      await updateDoc(eventRef, { votingPlaces: updatedPlaces });
-      console.log("Place removed from voting successfully");
-    } else {
-      console.error("Event does not exist");
-    }
-  } catch (e) {
-    console.error("Error removing place from voting:", e);
+    const proposalsCollection = collection(db, "proposals");
+    const q = query(proposalsCollection, where("groupId", "==", groupId));
+    const querySnapshot = await getDocs(q);
+    const proposals = [];
+    querySnapshot.forEach((doc) => {
+      proposals.push({ id: doc.id, ...doc.data() });
+    });
+    return proposals;
+  } catch (error) {
+    console.error("Error fetching proposals: ", error);
+    throw new Error("Failed to fetch proposals");
   }
 };
 
-// Update the vote
-export const updateVote = async (groupId, eventId, placeId, voteChange) => {
+
+export const deleteProposal = async (proposalId) => {
   try {
-    const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
-    const eventSnap = await getDoc(eventRef);
-    if (eventSnap.exists()) {
-      const updatedPlaces = eventSnap.data().votingPlaces.map((place) => {
-        if (place.id === placeId) {
-          return { ...place, votes: place.votes + voteChange };
-        }
-        return place;
-      });
-      await updateDoc(eventRef, { votingPlaces: updatedPlaces });
-      console.log("Vote updated successfully for place in event");
-    } else {
-      console.error("Event does not exist");
-    }
-  } catch (e) {
-    console.error("Error updating votes:", e);
+    const proposalRef = doc(db, "proposals", proposalId);
+    await deleteDoc(proposalRef);
+    console.log("Proposal deleted with ID: ", proposalId);
+  } catch (error) {
+    console.error("Error deleting proposal: ", error);
+    throw new Error("Failed to delete proposal");
   }
 };
 
-// Update votes for a place in an event
-export const updateVotes = async (
-  groupId,
-  eventId,
-  placeId,
-  incrementValue
-) => {
-  try {
-    const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
-    const eventSnap = await getDoc(eventRef);
-    if (eventSnap.exists()) {
-      const places = eventSnap.data().votingPlaces.map((place) => {
-        if (place.id === placeId) {
-          return { ...place, votes: place.votes + incrementValue };
-        }
-        return place;
-      });
-      await updateDoc(eventRef, { votingPlaces: places });
-      console.log("Votes updated for place in event.");
-    } else {
-      console.error("Event does not exist");
-    }
-  } catch (e) {
-    console.error("Error updating votes:", e);
-  }
+
+export const submitVote = async (groupId, placeId, voterId) => {
+  const votesCollection = collection(db, "votes");
+  const newVote = {
+    groupId,
+    placeId,
+    voterId,
+    timestamp: new Date()  // Useful for tracking when votes were cast
+  };
+  await addDoc(votesCollection, newVote);
 };
 
-// Add a place from Private Space to a Group/Event for voting
-export const addPlaceToVote = async (groupId, eventId, placeId, userId) => {
-  try {
-    const placeRef = doc(db, "privateSpaces", userId, "places", placeId);
-    const placeSnap = await getDoc(placeRef);
-    if (placeSnap.exists()) {
-      const eventRef = doc(db, "groupSpaces", groupId, "events", eventId);
-      const placeData = { ...placeSnap.data(), votes: 0 };
-      await updateDoc(eventRef, {
-        votingPlaces: firebase.firestore.FieldValue.arrayUnion(placeData),
-      });
-      console.log("Place added to voting in event with ID: ", eventId);
-    } else {
-      console.error("Place does not exist in Private Space");
-    }
-  } catch (e) {
-    console.error("Error adding place to voting:", e);
-  }
-};
 
 //--------------------------
 // Create/Read/Update/Delete Group functionality
