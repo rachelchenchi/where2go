@@ -17,18 +17,24 @@ const GroupDetailsPage = ({ user }) => {
   const [places, setPlaces] = useState([]);
   const [proposals, setProposals] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState('');
+  const [userVotes, setUserVotes] = useState({});
 
   useEffect(() => {
     if (!groupId || !user) return;
+    
 
     const fetchInitialData = async () => {
       try {
         const details = await db.getGroup(groupId);
         const userPlaces = await db.getUserPlaces(user.uid);
         const groupProposals = await db.fetchProposalsByGroup(groupId);
+        const userVotes = await db.fetchUserVotesByGroup(groupId, user.uid);
+
         setGroupDetails(details);
         setPlaces(userPlaces);
         setProposals(groupProposals);
+        setUserVotes(userVotes);
+
         if (userPlaces.length > 0) {
           setSelectedPlace(userPlaces[0].id); // Set the initial selected place
         }
@@ -70,32 +76,29 @@ const GroupDetailsPage = ({ user }) => {
   };
 
 
-  // const handleVote = async (proposalId) => {
-  //   try {
-  //     await db.submitVote(groupId, proposalId, user.uid);
-  //     alert('Vote submitted!');
-  //   } catch (error) {
-  //     console.error('Error submitting vote:', error);
-  //   }
-  // };
-
-
-  const handleVote = async (proposalId) => {
+  const handleVoteToggle = async (proposalId) => {
     try {
-      await db.submitVote(groupId, proposalId, user.uid);
-      setProposals(prevProposals => prevProposals.map(proposal => {
-        if (proposal.id === proposalId) {
-          return { ...proposal, votes: proposal.votes ? proposal.votes + 1 : 1 };
-        }
-        return proposal;
-      }));
-      alert('Vote submitted!');
-    } catch (error) {
-      console.error('Error submitting vote:', error);
-      alert('Failed to submit vote');
-    }
-  };
+        const result = await db.toggleVote(groupId, proposalId, user.uid);
 
+        // Update both userVotes and proposals
+        setUserVotes(prevVotes => ({
+            ...prevVotes,
+            [proposalId]: result === "vote added" ? true : false  // Toggle hasVoted state
+        }));
+
+        setProposals(prevProposals => prevProposals.map(proposal => {
+            if (proposal.id === proposalId) {
+                const votesChange = result === "vote added" ? 1 : -1;  // Determine whether to increment or decrement
+                return { ...proposal, votes: (proposal.votes || 0) + votesChange };  // Update vote count
+            }
+            return proposal;
+        }));
+
+        alert(result);
+    } catch (error) {
+        console.error('Error toggling vote:', error);
+    }
+};
 
 
   return (
@@ -142,8 +145,9 @@ const GroupDetailsPage = ({ user }) => {
                 yelpUrl={proposal.yelpUrl}
                 placeName={proposal.name}
                 votes={proposal.votes} // Ensure that your proposal object has a votes field
-                onVote={() => handleVote(proposal.id)}
+                onVote={() => handleVoteToggle(proposal.id)}
                 onDelete={() => handleDeleteProposal(proposal.id)}
+                hasVoted={!!userVotes[proposal.id]}
               />
             ))}
 

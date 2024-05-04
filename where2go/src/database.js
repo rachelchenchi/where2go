@@ -173,16 +173,42 @@ export const deleteProposal = async (proposalId) => {
 };
 
 
-export const submitVote = async (groupId, placeId, voterId) => {
+export const toggleVote = async (groupId, proposalId, userId) => {
   const votesCollection = collection(db, "votes");
-  const newVote = {
-    groupId,
-    placeId,
-    voterId,
-    timestamp: new Date()  // Useful for tracking when votes were cast
-  };
-  await addDoc(votesCollection, newVote);
+  const q = query(votesCollection, where("groupId", "==", groupId), where("proposalId", "==", proposalId), where("userId", "==", userId));
+
+  const querySnapshot = await getDocs(q);
+  if (querySnapshot.empty) {
+    const newVote = {
+      groupId,
+      proposalId,
+      userId,
+      timestamp: new Date()
+    };
+    await addDoc(votesCollection, newVote);
+    return "vote added"; 
+  } else {
+    querySnapshot.forEach(async doc => {
+      await deleteDoc(doc.ref);
+    });
+    return "vote removed";
+  }
 };
+
+
+export const fetchUserVotesByGroup = async (groupId, userId) => {
+  const votesCollection = collection(db, "votes");
+  const q = query(votesCollection, where("groupId", "==", groupId), where("userId", "==", userId));
+  const querySnapshot = await getDocs(q);
+  const userVotes = {};
+  querySnapshot.forEach(doc => {
+    const data = doc.data();
+    // Assuming each vote document includes a 'proposalId' field
+    userVotes[data.proposalId] = true;  // Mark this proposalId as voted on by the user
+  });
+  return userVotes;
+};
+
 
 
 //--------------------------
