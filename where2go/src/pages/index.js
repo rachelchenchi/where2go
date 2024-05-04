@@ -99,7 +99,7 @@ export default function Home(props) {
         </section>
 
 
-        <section style={{ paddingTop: '50px' }}>
+        <section style={{ paddingTop: '50px', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 class="title is-3 has-text-black">
