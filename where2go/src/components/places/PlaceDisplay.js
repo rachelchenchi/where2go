@@ -43,12 +43,12 @@ const PlaceDisplay = ({ place, onDelete, onEdit, showButtons = true }) => {
     <div className="column is-one-quarter">
       <div className="card">
         <div className="card-image">
-          <figure className="image is-1by1">
+          <figure className="image is-1by1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
             {place.imageUrl && (
               <img
                 src={place.imageUrl}
                 alt={`Image of ${place.name}`}
-                // style={{ width: '100%', height: '300px', marginBottom: '10px' }}
+                style={{ width: 'auto', width: '100%', objectFit: 'cover' }}
               />
             )}
           </figure>
