@@ -19,7 +19,6 @@ const GroupDetailsPage = ({ user }) => {
 
   useEffect(() => {
     if (!groupId || !user) return;
-    
 
     const fetchInitialData = async () => {
       try {
@@ -44,23 +43,33 @@ const GroupDetailsPage = ({ user }) => {
     fetchInitialData();
   }, [groupId, user]);
 
-  const handlePlaceSelection = async (selectedPlaceId) => {
-    const selectedPlace = places.find(place => place.id === selectedPlaceId);
-    if (selectedPlace) {
-      try {
-        const proposalId = await db.addProposal({
-          groupId,
-          userId: user.uid,
-          placeId: selectedPlaceId,
-          imageUrl: selectedPlace.imageUrl,
-          yelpUrl: selectedPlace.yelpUrl,
-          name: selectedPlace.name,
-          timestamp: new Date()
-        });
-        setProposals(prevProposals => [...prevProposals, { ...selectedPlace, id: proposalId }]);
-      } catch (error) {
-        console.error('Error adding proposal:', error);
-      }
+
+  const handlePropose = async ({ place, date }) => {
+    console.log("Attempting to propose", { place, date });
+
+    const proposalData = {
+      groupId,
+      userId: user.uid,
+      placeId: place.value,
+      // imageUrl: place.imageUrl, 
+      yelpUrl: place.yelpUrl,
+      name: place.label,
+      date: date ? date.toLocaleDateString() : undefined,
+      time: date ? date.toLocaleTimeString() : undefined,
+      timestamp: new Date()
+    };
+
+    try {
+      const proposalId = await db.addProposal(proposalData);
+      console.log("Proposal added with ID:", proposalId);
+      // setProposals(prevProposals => [...prevProposals, { ...proposalData, id: proposalId }]);
+      setProposals(prevProposals => {
+        const newProposals = [...prevProposals, { ...proposalData, id: proposalId }];
+        console.log("New proposals state:", newProposals); // Check the new state array
+        return newProposals;
+      });
+    } catch (error) {
+      console.error('Error adding proposal:', error);
     }
   };
 
@@ -76,27 +85,27 @@ const GroupDetailsPage = ({ user }) => {
 
   const handleVoteToggle = async (proposalId) => {
     try {
-        const result = await db.toggleVote(groupId, proposalId, user.uid);
+      const result = await db.toggleVote(groupId, proposalId, user.uid);
 
-        // Update both userVotes and proposals
-        setUserVotes(prevVotes => ({
-            ...prevVotes,
-            [proposalId]: result === "vote added" ? true : false  // Toggle hasVoted state
-        }));
+      // Update both userVotes and proposals
+      setUserVotes(prevVotes => ({
+        ...prevVotes,
+        [proposalId]: result === "vote added" ? true : false  // Toggle hasVoted state
+      }));
 
-        setProposals(prevProposals => prevProposals.map(proposal => {
-            if (proposal.id === proposalId) {
-                const votesChange = result === "vote added" ? 1 : -1;  // Determine whether to increment or decrement
-                return { ...proposal, votes: (proposal.votes || 0) + votesChange };  // Update vote count
-            }
-            return proposal;
-        }));
+      setProposals(prevProposals => prevProposals.map(proposal => {
+        if (proposal.id === proposalId) {
+          const votesChange = result === "vote added" ? 1 : -1;  // Determine whether to increment or decrement
+          return { ...proposal, votes: (proposal.votes || 0) + votesChange };  // Update vote count
+        }
+        return proposal;
+      }));
 
-        alert(result);
+      alert(result);
     } catch (error) {
-        console.error('Error toggling vote:', error);
+      console.error('Error toggling vote:', error);
     }
-};
+  };
 
 
   return (
@@ -117,9 +126,12 @@ const GroupDetailsPage = ({ user }) => {
           <div className="column is-7">
             {places.length ? (
               <Dropdown
-                options={places.map(place => ({ value: place.id, label: place.name }))}
-                value={selectedPlace}
-                onChange={handlePlaceSelection}
+                options={places.map(place => ({
+                  value: place.id,
+                  label: place.name,
+                  yelpUrl: place.yelpUrl
+                }))}
+                onPropose={handlePropose}
               />
             ) : (
               <p className="notification is-primary">
@@ -134,13 +146,15 @@ const GroupDetailsPage = ({ user }) => {
             {proposals.map(proposal => (
               <Card
                 key={proposal.id}
-                imageUrl={proposal.imageUrl}
+                // imageUrl={proposal.imageUrl}
                 yelpUrl={proposal.yelpUrl}
                 placeName={proposal.name}
-                votes={proposal.votes} // Ensure that your proposal object has a votes field
-                onVote={() => handleVoteToggle(proposal.id)}
-                onDelete={() => handleDeleteProposal(proposal.id)}
-                hasVoted={!!userVotes[proposal.id]}
+                date={proposal.date}
+                time={proposal.time}
+              // votes={proposal.votes} // Ensure that your proposal object has a votes field
+              // onVote={() => handleVoteToggle(proposal.id)}
+              onDelete={() => handleDeleteProposal(proposal.id)}
+              // hasVoted={!!userVotes[proposal.id]}
               />
             ))}
 

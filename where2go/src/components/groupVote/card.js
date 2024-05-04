@@ -1,21 +1,18 @@
 import React from 'react';
 
 
-const Card = ({ member, onVote, onDelete, votes, imageUrl, yelpUrl, placeName, hasVoted }) => {
+const Card = ({ member, onVote, onDelete, votes, imageUrl, date, time, yelpUrl, placeName, hasVoted }) => {
   return (
     <div className="card">
-      <div className="card-image">
-        <figure className="image">
-          <img src={imageUrl} alt={placeName} />
-        </figure>
-      </div>
+      <head class="card-header">
+        <p class="card-header-title">Proposal</p>
+      </head>
       <div className="card-content">
         <div className="media">
           <div className="media-content">
-            <p className="title is-4">{placeName}</p>
+            <p className="title is-3">{placeName}</p>
           </div>
         </div>
-
         <div className="content">
           <a href={yelpUrl}
             target="_blank"
@@ -23,23 +20,21 @@ const Card = ({ member, onVote, onDelete, votes, imageUrl, yelpUrl, placeName, h
             className="button is-small is-link is-outlined">
             Check on Yelp
           </a>
-          <p>
-            Note: Let's go to here on xxx at xxx
+          <p style={{ margin: '10px' }}>
+            Note: Let's go to here on {date} at {time}
           </p>
         </div>
+
+        <footer className="card-footer">
+          <button className={`card-footer-item button ${hasVoted ? 'is-info' : 'is-primary'}`}
+            onClick={onVote}>
+            {hasVoted ? 'Unvote' : 'Vote'}
+          </button>
+          <p className="card-footer-item">Votes: {votes}</p>
+          <button onClick={onDelete} className="button is-danger">Delete</button>
+        </footer>
+
       </div>
-      <footer className="card-footer">
-        {/* <button className="card-footer-item button is-primary" onClick={onVote}>Vote</button> */}
-
-        <button className={`card-footer-item button ${hasVoted ? 'is-info' : 'is-primary'}`}
-          onClick={onVote}>
-          {hasVoted ? 'Unvote' : 'Vote'}
-        </button>
-
-        <p className="card-footer-item">Votes: {votes}</p>
-        <button onClick={onDelete} className="button is-danger">Delete</button>
-
-      </footer>
     </div>
   );
 };
