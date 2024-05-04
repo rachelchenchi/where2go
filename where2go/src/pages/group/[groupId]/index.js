@@ -2,12 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Dropdown from '@/components/groupVote/dropdown';
 import Card from '@/components/groupVote/card';
-import PickTime from '@/components/groupVote/pickTime'
 import * as db from '@/database';
 import styles from '@/styles/GroupDetails.module.css';
 import Link from 'next/link';
 import 'react-datepicker/dist/react-datepicker.css';
-import DatePicker from "react-datepicker";
 
 
 const GroupDetailsPage = ({ user }) => {
@@ -102,7 +100,7 @@ const GroupDetailsPage = ({ user }) => {
 
 
   return (
-    <div>
+    <div style={{ marginLeft: '200px', marginRight: '200px' }}>
       <div className={styles.divWrapper + " is-flex is-flex-direction-column is-align-items-center"}>
         <div className="title has-text-centered">
           Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
@@ -114,9 +112,9 @@ const GroupDetailsPage = ({ user }) => {
         </div>
       </div>
 
-      <div className='container'>
+      <div className='container' style={{ margin: '20px' }}>
         <div className="columns">
-          <div className="column is-4">
+          <div className="column is-7">
             {places.length ? (
               <Dropdown
                 options={places.map(place => ({ value: place.id, label: place.name }))}
@@ -130,13 +128,8 @@ const GroupDetailsPage = ({ user }) => {
             )}
           </div>
 
-          <div className="column is-4">
-            <PickTime />
-          </div>
-
-
           {/* <div className={styles.borderleft + " column is-4"}> */}
-          <div className="column is-4">
+          <div className="column">
 
             {proposals.map(proposal => (
               <Card
