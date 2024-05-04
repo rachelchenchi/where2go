@@ -167,12 +167,24 @@ const Group = ({ user }) => {
     const userConfirmed = window.confirm(
       "Are you sure you want to leave the group?"
     );
-
+  
     if (userConfirmed) {
       try {
-        await db.leaveGroup(group.id, user.uid);
-        console.log("You have left the group.");
-        await fetchGroups();
+        const groupData = await db.getGroup(group.id);
+  
+        if (groupData) {
+          // Filter out the leaving user from the members array
+          const updatedMembers = groupData.members.filter(member => member.userId !== user.uid);
+          const updatedMembersId = groupData.membersId.filter(memberId => memberId !== user.uid);
+  
+          // Update the group's 'members' and 'membersId' fields
+          await db.updateGroup(group.id, { members: updatedMembers, membersId: updatedMembersId });
+          console.log("You have left the group.");
+          await fetchGroups();
+        } else {
+          console.error("No such group exists.");
+          alert("Failed to leave the group."); // Notify user if group does not exist
+        }
       } catch (error) {
         console.error("Error leaving group:", error);
         alert("Failed to leave the group."); // Notify user about the error

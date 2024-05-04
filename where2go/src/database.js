@@ -238,22 +238,6 @@ export const getAllGroups = async (userId) => {
   }
 };
 
-// Fetch user's Owned Group Space (only owned)
-export const getOwnedGroups = async (userId) => {
-  try {
-    const groupsRef = query(
-      collection(db, "groups"),
-      where("ownerId", "==", userId)
-    );
-    const snapshot = await getDocs(groupsRef);
-    const groups = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    console.log("Retrieved groups:", groups);
-    return groups;
-  } catch (e) {
-    console.error("Error fetching owned groups:", e);
-  }
-};
-
 // Delete a group/event if it is owned by this user
 export const deleteGroup = async (groupId) => {
   try {
@@ -266,39 +250,12 @@ export const deleteGroup = async (groupId) => {
   }
 };
 
-// Update Group Member if it is owned by this user
+// Update Group Data if it is owned by this user
 export const updateGroup = async (groupId, updatedData) => {
   try {
     await updateDoc(doc(db, "groups", groupId), updatedData);
     console.log(`Group with ID ${groupId} updated`);
   } catch (e) {
     console.error("Error deleting member from group:", e);
-  }
-};
-
-// Leave Group if user is a member of the group
-export const leaveGroup = async (groupId, userId) => {
-  console.log("GroupId:", groupId);  // Check if groupId is valid
-  console.log("UserId:", userId);    // Check if userId is valid
-  try {
-    const groupRef = doc(db, "groups", groupId);
-    const groupDoc = await getDoc(groupRef);
-    
-    if (groupDoc.exists()) {
-      // Retrieve the current members and member IDs from the group document
-      const { members, membersId } = groupDoc.data();
-
-      // Filter out the leaving user from both arrays
-      const updatedMembers = members.filter(member => member.userId !== userId);
-      const updatedMembersId = membersId.filter(memberId => memberId !== userId);
-
-      // Update the group's 'members' and 'membersId' fields in Firestore
-      await updateDoc(groupRef, { members: updatedMembers, membersId: updatedMembersId });
-      console.log(`User ${userId} removed from group with ID ${groupId}`);
-    } else {
-      console.log("No such group exists.");
-    }
-  } catch (error) {
-    console.error("Error removing user from group:", error);
   }
 };
