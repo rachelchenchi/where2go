@@ -1,11 +1,11 @@
 import React from 'react';
 
 
-const Card = ({ member, onVote, onDelete, votes, imageUrl, date, time, yelpUrl, placeName, hasVoted }) => {
+const Card = ({ index, userId, currentUser, onVote, onDelete, votes, imageUrl, date, time, yelpUrl, placeName, hasVoted }) => {
   return (
     <div className="card">
       <head class="card-header">
-        <p class="card-header-title">Proposal</p>
+        <p class="card-header-title">Proposal {index + 1}</p>
       </head>
       <div className="card-content">
         <div className="media">
@@ -21,7 +21,7 @@ const Card = ({ member, onVote, onDelete, votes, imageUrl, date, time, yelpUrl, 
             Check on Yelp
           </a>
           <p style={{ margin: '10px' }}>
-            Note: Let's go to here on {date} at {time}
+            Note: Let's go to here on {date} at {time} ET.
           </p>
         </div>
 
@@ -31,7 +31,9 @@ const Card = ({ member, onVote, onDelete, votes, imageUrl, date, time, yelpUrl, 
             {hasVoted ? 'Unvote' : 'Vote'}
           </button>
           <p className="card-footer-item">Votes: {votes}</p>
-          <button onClick={onDelete} className="button is-danger">Delete</button>
+          {userId === currentUser && (
+            <button onClick={onDelete} className="button is-danger">Delete</button>
+          )}
         </footer>
 
       </div>

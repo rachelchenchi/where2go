@@ -143,10 +143,13 @@ const GroupDetailsPage = ({ user }) => {
           {/* <div className={styles.borderleft + " column is-4"}> */}
           <div className="column">
 
-            {proposals.map(proposal => (
+            {proposals.map((proposal, index) => (
               <Card
                 key={proposal.id}
+                index={index}
                 // imageUrl={proposal.imageUrl}
+                userId={proposal.userId}
+                currentUser={user.uid}
                 yelpUrl={proposal.yelpUrl}
                 placeName={proposal.name}
                 date={proposal.date}
