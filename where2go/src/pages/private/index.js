@@ -65,6 +65,7 @@ const Private = ({ user }) => {
         <>
             <Head>
                 <title>Private Space</title>
+                <link rel="icon" href="/hands-up.png" />
             </Head>
 
             <div className="container">
