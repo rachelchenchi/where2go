@@ -209,12 +209,12 @@ const Group = ({ user }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/hands-up.png" />
       </Head>
-      <section className="section">
-        {/* <h1 className="title">Group Space</h1> */}
+      <section className="container">
+        <h1 style={{ marginTop: "20px", display: "flex", justifyContent: "center" }} className="title">Group Space</h1>
 
         <div className="columns">
           <div className="column is-one-third">
-            <h1 className="title">Join Existing Group</h1>
+            <h1 className="title is-size-4">Join Existing Group</h1>
             <form onSubmit={handleGroupJoined}>
               <div className="field has-addons">
                 <p className="control">
@@ -234,7 +234,7 @@ const Group = ({ user }) => {
             </form>
           </div>
           <div className="column is">
-            <h1 className="title">Plan a New Event</h1>
+            <h1 className="title is-size-4">Plan a New Event</h1>
             <form onSubmit={handleGroupCreated}>
               <div className="field">
                 <label class="label">What is this group about?</label>
@@ -300,8 +300,8 @@ const Group = ({ user }) => {
           )}
         </div>
       </section>
-      <section className="section">
-        <div className="title is-3">View Active Groups</div>
+      <section className="container">
+        <div className="title is-size-4">View Active Groups</div>
         <table className="table">
           <thead>
             <th>Group</th>
@@ -374,6 +374,7 @@ const Group = ({ user }) => {
             })}
           </tbody>
         </table>
+        <div></div>
       </section>
     </>
   );
