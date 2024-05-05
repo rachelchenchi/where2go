@@ -12,10 +12,13 @@ import {
   deleteDoc,
   updateDoc,
   increment,
+  writeBatch,
+  onSnapshot
 } from "firebase/firestore";
 
 // CS5356 TO-DO #0 Initialize Firestore
 const db = getFirestore(firebaseApp);
+// export { db };
 
 // CS5356 TO-DO #1
 export const createPost = async (post) => {
@@ -134,8 +137,11 @@ export const getCommunityPlaces = async () => {
 export const addProposal = async (proposalData) => {
   try {
     const proposalsCollection = collection(db, "proposals");
-    const docRef = await addDoc(proposalsCollection, proposalData);
+    const docRef = await addDoc(proposalsCollection, {...proposalData, votes: 0});
     console.log("Proposal added with ID: ", docRef.id);
+    await updateDoc(doc(db, "proposals", docRef.id), {
+      proposalId: docRef.id
+    });
     return docRef.id;
   } catch (error) {
     console.error("Error adding proposal: ", error);
@@ -151,7 +157,8 @@ export const fetchProposalsByGroup = async (groupId) => {
     const querySnapshot = await getDocs(q);
     const proposals = [];
     querySnapshot.forEach((doc) => {
-      proposals.push({ id: doc.id, ...doc.data() });
+      const data = doc.data();
+      proposals.push({ id: doc.id, ...data, votes: data.votes || 0 });
     });
     return proposals;
   } catch (error) {
@@ -162,15 +169,83 @@ export const fetchProposalsByGroup = async (groupId) => {
 
 
 export const deleteProposal = async (proposalId) => {
+  const batch = writeBatch(db);
+
   try {
     const proposalRef = doc(db, "proposals", proposalId);
-    await deleteDoc(proposalRef);
-    console.log("Proposal deleted with ID: ", proposalId);
+    batch.delete(proposalRef);
+
+    const votesCollectionRef = collection(db, "votes");
+    const q = query(votesCollectionRef, where("proposalId", "==", proposalId));
+    const votesSnapshot = await getDocs(q);
+
+    votesSnapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+    console.log("Proposal and associated votes deleted with ID: ", proposalId);
   } catch (error) {
-    console.error("Error deleting proposal: ", error);
-    throw new Error("Failed to delete proposal");
+    console.error("Error deleting proposal and votes: ", error);
+    throw new Error("Failed to delete proposal and votes");
   }
 };
+
+
+export const listenForProposalUpdates = (groupId, callback, errorCallback) => {
+  const proposalsRef = collection(db, 'proposals');
+  const q = query(proposalsRef, where("groupId", "==", groupId));
+
+  const unsubscribe = onSnapshot(q, snapshot => {
+    const updatedProposals = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    callback(updatedProposals);
+  }, errorCallback);
+
+  return unsubscribe;
+};
+
+// export const listenForVoteUpdates = (groupId, setVoteUpdates) => {
+//   const votesRef = collection(db, 'votes');
+//   const q = query(votesRef, where("groupId", "==", groupId));
+
+//   const unsubscribe = onSnapshot(q, snapshot => {
+//     const votesByProposal = {};
+//     snapshot.docs.forEach(doc => {
+//       const data = doc.data();
+//       if (!votesByProposal[data.proposalId]) {
+//         votesByProposal[data.proposalId] = 0;
+//       }
+//       votesByProposal[data.proposalId]++;
+//     });
+//     setVoteUpdates(votesByProposal);
+//   }, error => {
+//     console.error("Error listening for vote updates:", error);
+//   });
+
+//   return unsubscribe;
+// };
+
+export const listenForVoteUpdates = (groupId, callback) => {
+  const votesRef = collection(db, 'votes');
+  const q = query(votesRef, where("groupId", "==", groupId));
+
+  const unsubscribe = onSnapshot(q, snapshot => {
+    const votesByProposal = {};
+    snapshot.docs.forEach(doc => {
+      const data = doc.data();
+      votesByProposal[data.proposalId] = (votesByProposal[data.proposalId] || 0) + 1;
+    });
+    callback(votesByProposal);
+  }, error => {
+    console.error("Error listening for vote updates:", error);
+  });
+
+  return unsubscribe;
+};
+
 
 
 export const toggleVote = async (groupId, proposalId, userId) => {
@@ -186,7 +261,7 @@ export const toggleVote = async (groupId, proposalId, userId) => {
       timestamp: new Date()
     };
     await addDoc(votesCollection, newVote);
-    return "vote added"; 
+    return "vote added";
   } else {
     querySnapshot.forEach(async doc => {
       await deleteDoc(doc.ref);
@@ -203,8 +278,7 @@ export const fetchUserVotesByGroup = async (groupId, userId) => {
   const userVotes = {};
   querySnapshot.forEach(doc => {
     const data = doc.data();
-    // Assuming each vote document includes a 'proposalId' field
-    userVotes[data.proposalId] = true;  // Mark this proposalId as voted on by the user
+    userVotes[data.proposalId] = true;
   });
   return userVotes;
 };
@@ -229,22 +303,22 @@ export const createGroup = async (groupData) => {
 // Fetch Group by groupId
 export const getGroup = async (groupId) => {
   try {
-    const docRef = doc(db, "groups", groupId); 
+    const docRef = doc(db, "groups", groupId);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       console.log(`Retrieved group with ID ${groupId}: `, docSnap.data());
       // Return the group data with its ID
-      return { id: docSnap.id, ...docSnap.data() }; 
+      return { id: docSnap.id, ...docSnap.data() };
     } else {
       // Return null if the document does not exist
       console.log("No such group!");
-      return null; 
+      return null;
     }
   } catch (e) {
     // Handle errors and possibly return null
     console.error(`Error fetching group with ID ${groupId}:`, e);
-    return null; 
+    return null;
   }
 };
 

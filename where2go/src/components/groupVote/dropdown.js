@@ -47,7 +47,7 @@ const DropdownItem = ({ option, onPropose }) => {
                 style={{ marginLeft: '20px', marginRight: '20px', whiteSpace: 'normal', overflowWrap: 'break-word' }}
                 onClick={(e) => {
                     e.preventDefault();
-                    option.isSelected = true;  // Update the selection state
+                    option.isSelected = true;
                 }}>
                 {option.label}
             </span>

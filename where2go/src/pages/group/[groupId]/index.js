@@ -3,7 +3,6 @@ import { useRouter } from 'next/router';
 import Dropdown from '@/components/groupVote/dropdown';
 import Card from '@/components/groupVote/card';
 import * as db from '@/database';
-import styles from '@/styles/GroupDetails.module.css';
 import Link from 'next/link';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -16,9 +15,22 @@ const GroupDetailsPage = ({ user }) => {
   const [proposals, setProposals] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState('');
   const [userVotes, setUserVotes] = useState({});
+  const [totalMembers, setTotalMembers] = useState({});
+  const MemoizedCard = React.memo(Card);
+  const MemoizedDropdown = React.memo(Dropdown);
 
-  useEffect(() => {
+
+  React.useEffect(() => {
+    console.log("Component rerendered");
     if (!groupId || !user) return;
+
+    const unsubscribeProposals = db.listenForProposalUpdates(groupId, setProposals, console.error);
+    const unsubscribeVotes = db.listenForVoteUpdates(groupId, voteUpdates => {
+      setProposals(prevProposals => prevProposals.map(proposal => ({
+        ...proposal,
+        votes: voteUpdates[proposal.id] || proposal.votes
+      })));
+    });
 
     const fetchInitialData = async () => {
       try {
@@ -26,21 +38,33 @@ const GroupDetailsPage = ({ user }) => {
         const userPlaces = await db.getUserPlaces(user.uid);
         const groupProposals = await db.fetchProposalsByGroup(groupId);
         const userVotes = await db.fetchUserVotesByGroup(groupId, user.uid);
+        const totalMembers = details.membersId ? details.membersId.length : 0;
 
         setGroupDetails(details);
         setPlaces(userPlaces);
-        setProposals(groupProposals);
+        setProposals(groupProposals.map(proposal => ({
+          ...proposal,
+          totalMembers
+        })));
         setUserVotes(userVotes);
+        setTotalMembers(totalMembers);
 
         if (userPlaces.length > 0) {
-          setSelectedPlace(userPlaces[0].id); // Set the initial selected place
+          setSelectedPlace(userPlaces[0].id);
         }
+        
       } catch (error) {
         console.error('Error fetching initial data:', error);
       }
     };
 
     fetchInitialData();
+
+    return () => {
+      unsubscribeProposals();
+      unsubscribeVotes();
+    };
+    
   }, [groupId, user]);
 
 
@@ -56,18 +80,19 @@ const GroupDetailsPage = ({ user }) => {
       name: place.label,
       date: date ? date.toLocaleDateString() : undefined,
       time: date ? date.toLocaleTimeString() : undefined,
-      timestamp: new Date()
+      timestamp: new Date(),
+      votes: 0,
+      totalMembers
     };
 
     try {
       const proposalId = await db.addProposal(proposalData);
       console.log("Proposal added with ID:", proposalId);
-      // setProposals(prevProposals => [...prevProposals, { ...proposalData, id: proposalId }]);
-      setProposals(prevProposals => {
-        const newProposals = [...prevProposals, { ...proposalData, id: proposalId }];
-        console.log("New proposals state:", newProposals); // Check the new state array
-        return newProposals;
-      });
+      // setProposals(prevProposals => {
+      //   const newProposals = [...prevProposals, { ...proposalData, id: proposalId }];
+      //   console.log("New proposals state:", newProposals);
+      //   return newProposals;
+      // });
     } catch (error) {
       console.error('Error adding proposal:', error);
     }
@@ -83,49 +108,41 @@ const GroupDetailsPage = ({ user }) => {
   };
 
 
-  const handleVoteToggle = async (proposalId) => {
-    try {
-      const result = await db.toggleVote(groupId, proposalId, user.uid);
 
-      // Update both userVotes and proposals
+  const handleVoteToggle = async (proposalId, hasVoted) => {
+    try {
+      const result = await db.toggleVote(groupId, proposalId, user.uid, hasVoted);
+
       setUserVotes(prevVotes => ({
         ...prevVotes,
-        [proposalId]: result === "vote added" ? true : false  // Toggle hasVoted state
+        [proposalId]: result === "vote added" ? true : false
       }));
 
-      setProposals(prevProposals => prevProposals.map(proposal => {
-        if (proposal.id === proposalId) {
-          const votesChange = result === "vote added" ? 1 : -1;  // Determine whether to increment or decrement
-          return { ...proposal, votes: (proposal.votes || 0) + votesChange };  // Update vote count
-        }
-        return proposal;
-      }));
-
-      alert(result);
+      // Don't manipulate votes directly, let the listener handle it
+      alert(result === "vote added" ? "Vote Added" : "Vote Removed");
     } catch (error) {
       console.error('Error toggling vote:', error);
     }
   };
 
 
+
   return (
-    <div style={{ marginLeft: '200px', marginRight: '200px' }}>
-      <div className={styles.divWrapper + " is-flex is-flex-direction-column is-align-items-center"}>
-        <div className="title has-text-centered">
+    <div style={{ marginLeft: '200px', marginRight: '200px', flexGrow: 1 }}>
+        <div className="title has-text-centered" style={{ margin:'20px' }}>
           Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
         </div>
-        <div className="mt-3">
+        <div className="mt-3" style={{ display: 'flex', justifyContent: 'center' }}>
           <Link href="/group">
             <button className="button is-info is-small">Back to Group List</button>
           </Link>
         </div>
-      </div>
 
       <div className='container' style={{ margin: '20px' }}>
         <div className="columns">
           <div className="column is-7">
             {places.length ? (
-              <Dropdown
+              <MemoizedDropdown
                 options={places.map(place => ({
                   value: place.id,
                   label: place.name,
@@ -144,7 +161,7 @@ const GroupDetailsPage = ({ user }) => {
           <div className="column">
 
             {proposals.map((proposal, index) => (
-              <Card
+              <MemoizedCard
                 key={proposal.id}
                 index={index}
                 // imageUrl={proposal.imageUrl}
@@ -154,10 +171,11 @@ const GroupDetailsPage = ({ user }) => {
                 placeName={proposal.name}
                 date={proposal.date}
                 time={proposal.time}
-              // votes={proposal.votes} // Ensure that your proposal object has a votes field
-              // onVote={() => handleVoteToggle(proposal.id)}
-              onDelete={() => handleDeleteProposal(proposal.id)}
-              // hasVoted={!!userVotes[proposal.id]}
+                votes={proposal.votes}
+                onVote={() => handleVoteToggle(proposal.id)}
+                onDelete={() => handleDeleteProposal(proposal.id)}
+                hasVoted={!!userVotes[proposal.id]}
+                totalMembers={proposal.totalMembers}
               />
             ))}
 
