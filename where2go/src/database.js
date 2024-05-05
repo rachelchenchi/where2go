@@ -207,26 +207,6 @@ export const listenForProposalUpdates = (groupId, callback, errorCallback) => {
   return unsubscribe;
 };
 
-// export const listenForVoteUpdates = (groupId, setVoteUpdates) => {
-//   const votesRef = collection(db, 'votes');
-//   const q = query(votesRef, where("groupId", "==", groupId));
-
-//   const unsubscribe = onSnapshot(q, snapshot => {
-//     const votesByProposal = {};
-//     snapshot.docs.forEach(doc => {
-//       const data = doc.data();
-//       if (!votesByProposal[data.proposalId]) {
-//         votesByProposal[data.proposalId] = 0;
-//       }
-//       votesByProposal[data.proposalId]++;
-//     });
-//     setVoteUpdates(votesByProposal);
-//   }, error => {
-//     console.error("Error listening for vote updates:", error);
-//   });
-
-//   return unsubscribe;
-// };
 
 export const listenForVoteUpdates = (groupId, callback) => {
   const votesRef = collection(db, 'votes');
@@ -245,7 +225,6 @@ export const listenForVoteUpdates = (groupId, callback) => {
 
   return unsubscribe;
 };
-
 
 
 export const toggleVote = async (groupId, proposalId, userId) => {

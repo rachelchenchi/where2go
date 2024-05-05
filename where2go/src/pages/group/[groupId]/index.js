@@ -89,11 +89,6 @@ const GroupDetailsPage = ({ user }) => {
     try {
       const proposalId = await db.addProposal(proposalData);
       console.log("Proposal added with ID:", proposalId);
-      // setProposals(prevProposals => {
-      //   const newProposals = [...prevProposals, { ...proposalData, id: proposalId }];
-      //   console.log("New proposals state:", newProposals);
-      //   return newProposals;
-      // });
     } catch (error) {
       console.error('Error adding proposal:', error);
     }
