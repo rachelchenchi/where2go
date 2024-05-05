@@ -19,7 +19,7 @@ const PickTime = ({ onChangeDate, startDate, endDate }) => {
             dateFormat="Pp"
             minDate={new Date(startDate)}
             maxDate={new Date(endDate)}
-            className="date-picker-dropdown"
+            // className="date-picker-dropdown"
         >
             <div style={{ color: "red" }}>Don't forget to check the weather!</div>
         </DatePicker>

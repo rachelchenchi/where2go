@@ -5,7 +5,7 @@ import Dropdown from '@/components/groupVote/dropdown';
 import Card from '@/components/groupVote/card';
 import * as db from '@/database';
 import Link from 'next/link';
-import 'react-datepicker/dist/react-datepicker.css';
+// import 'react-datepicker/dist/react-datepicker.css';
 
 
 const GroupDetailsPage = ({ user }) => {
@@ -29,7 +29,7 @@ const GroupDetailsPage = ({ user }) => {
     const unsubscribeVotes = db.listenForVoteUpdates(groupId, voteUpdates => {
       setProposals(prevProposals => prevProposals.map(proposal => ({
         ...proposal,
-        votes: voteUpdates[proposal.id] || proposal.votes
+        votes: voteUpdates[proposal.id] || 0
       })));
     });
 
@@ -113,8 +113,7 @@ const GroupDetailsPage = ({ user }) => {
         ...prevVotes,
         [proposalId]: result === "vote added" ? true : false
       }));
-
-      // Don't manipulate votes directly, let the listener handle it
+      
       alert(result === "vote added" ? "Vote Added" : "Vote Removed");
     } catch (error) {
       console.error('Error toggling vote:', error);
@@ -132,7 +131,7 @@ const GroupDetailsPage = ({ user }) => {
         <link rel="icon" href="/hands-up.png" />
       </Head>
       
-      <div style={{ marginLeft: '200px', marginRight: '200px', flexGrow: 1 }}>
+      <div style={{ marginLeft: '200px', marginRight: '200px' }}>
         <div className="title has-text-centered" style={{ margin: '20px' }}>
           Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
         </div>
@@ -163,8 +162,7 @@ const GroupDetailsPage = ({ user }) => {
               )}
             </div>
 
-            {/* <div className={styles.borderleft + " column is-4"}> */}
-            <div className="column">
+            <div className="column is-5" style={{ minHeight: '600px'}}> 
 
               {proposals.map((proposal, index) => (
                 <MemoizedCard
@@ -172,7 +170,6 @@ const GroupDetailsPage = ({ user }) => {
                   index={index}
                   // imageUrl={proposal.imageUrl}
                   userId={proposal.userId}
-                  // currentUser={user.uid}
                   currentUser={user ? user.uid : null}
                   yelpUrl={proposal.yelpUrl}
                   placeName={proposal.name}
