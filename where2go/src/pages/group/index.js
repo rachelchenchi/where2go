@@ -230,14 +230,14 @@ const Group = ({ user }) => {
                   <button className="button is-primary">Join</button>
                 </p>
               </div>
-              <p class="help is-success">Paste the group url here</p>
+              <p className="help is-success">Paste the group url here</p>
             </form>
           </div>
           <div className="column is">
             <h1 className="title is-size-4">Plan a New Event</h1>
             <form onSubmit={handleGroupCreated}>
               <div className="field">
-                <label class="label">What is this group about?</label>
+                <label className="label">What is this group about?</label>
                 <p className="control">
                   <input
                     className="input"
@@ -249,15 +249,15 @@ const Group = ({ user }) => {
                 </p>
               </div>
               <div className="field">
-                <label class="label">What date might work?</label>
-                <p className="control">
+                <label className="label">What date might work?</label>
+                <div className="control">
                   <div className="columns">
                     <div className="column is-one-quarter">
                       <DatePicker
                         selected={startDate}
                         onChange={(date) => setStartDate(date.valueOf())}
                       />
-                      <p class="help is-success">Choose a start date</p>
+                      <p className="help is-success">Choose a start date</p>
                     </div>
                     <div className="column is-1">-</div>
                     <div className="column is-one-quarter">
@@ -277,7 +277,7 @@ const Group = ({ user }) => {
                       <p className="help is-success">Choose an end date</p>
                     </div>
                   </div>
-                </p>
+                </div>
               </div>
               <div className="field">
                 <p className="control">
@@ -304,12 +304,14 @@ const Group = ({ user }) => {
         <div className="title is-size-4">View Active Groups</div>
         <table className="table">
           <thead>
+            <tr>
             <th>Group</th>
             <th>Owner</th>
             <th>Members</th>
             <th>Event Date</th>
             <th>Date created</th>
             {/* <th>Delete?</th> */}
+            </tr>
           </thead>
           <tbody>
             {groups?.map((group, index) => {

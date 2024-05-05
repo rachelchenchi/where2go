@@ -78,7 +78,7 @@ const Private = ({ user }) => {
                     >
                         +
                     </button>
-                    <h2 class="subtitle" style={{ marginLeft: "10px", fontWeight: "bold" }} >
+                    <h2 className="subtitle" style={{ marginLeft: "10px", fontWeight: "bold" }} >
                         Add a new place!
                     </h2>
                 </div>

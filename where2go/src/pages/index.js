@@ -100,15 +100,15 @@ export default function Home(props) {
 
 
         <section style={{ paddingTop: '50px', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}>
-          <div class="hero-body">
-            <div class="container has-text-centered">
-              <h1 class="title is-3 has-text-black">
+          <div className="hero-body">
+            <div className="container has-text-centered">
+              <h1 className="title is-3 has-text-black">
                 Take a look at what favorites others have!
               </h1>
             </div>
           </div>
           <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
-            <button onClick={handleReloadPlaces} class="button is-info" style={{ fontSize: "24px", color: "white", fontWeight: "bolder" }}>&#10227;</button>
+            <button onClick={handleReloadPlaces} className="button is-info" style={{ fontSize: "24px", color: "white", fontWeight: "bolder" }}>&#10227;</button>
           </div>
           <div className="places-container">
             {places.map((place) => (

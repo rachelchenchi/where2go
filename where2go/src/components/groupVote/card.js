@@ -12,9 +12,9 @@ const Card = ({
 
   return (
     <div className="card">
-      <head class="card-header">
-        <p class="card-header-title">Proposal {index + 1}</p>
-      </head>
+      <header className="card-header">
+        <p className="card-header-title">Proposal {index + 1}</p>
+      </header>
 
       <div className="card-content">
         <div className="media">

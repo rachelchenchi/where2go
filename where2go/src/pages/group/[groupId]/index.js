@@ -131,6 +131,7 @@ const GroupDetailsPage = ({ user }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/hands-up.png" />
       </Head>
+      
       <div style={{ marginLeft: '200px', marginRight: '200px', flexGrow: 1 }}>
         <div className="title has-text-centered" style={{ margin: '20px' }}>
           Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
@@ -171,7 +172,8 @@ const GroupDetailsPage = ({ user }) => {
                   index={index}
                   // imageUrl={proposal.imageUrl}
                   userId={proposal.userId}
-                  currentUser={user.uid}
+                  // currentUser={user.uid}
+                  currentUser={user ? user.uid : null}
                   yelpUrl={proposal.yelpUrl}
                   placeName={proposal.name}
                   date={proposal.date}
