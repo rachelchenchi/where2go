@@ -21,7 +21,7 @@ const GroupDetailsPage = ({ user }) => {
   const MemoizedDropdown = React.memo(Dropdown);
 
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log("Component rerendered");
     if (!groupId || !user) return;
 
@@ -152,6 +152,8 @@ const GroupDetailsPage = ({ user }) => {
                     yelpUrl: place.yelpUrl
                   }))}
                   onPropose={handlePropose}
+                  startDate={groupDetails.startDate}
+                  endDate={groupDetails.endDate}
                 />
               ) : (
                 <p className="notification is-primary">

@@ -3,20 +3,22 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
-const PickTime = ({ onChangeDate }) => {
-    const [startDate, setStartDate] = useState(null);
+const PickTime = ({ onChangeDate, startDate, endDate }) => {
+    const [selectedDate, setSelectedDate] = useState(null);
 
     return (
         <DatePicker
             showIcon
             placeholderText="Click to select a date"
-            selected={startDate}
+            selected={selectedDate}
             onChange={(date) => {
-                setStartDate(date);
+                setSelectedDate(date);
                 onChangeDate(date);
             }}
             showTimeSelect
             dateFormat="Pp"
+            minDate={new Date(startDate)}
+            maxDate={new Date(endDate)}
             className="date-picker-dropdown"
         >
             <div style={{ color: "red" }}>Don't forget to check the weather!</div>
@@ -24,7 +26,7 @@ const PickTime = ({ onChangeDate }) => {
     );
 };
 
-const DropdownItem = ({ option, onPropose }) => {
+const DropdownItem = ({ option, onPropose, startDate, endDate }) => {
     const [selectedDate, setSelectedDate] = useState(null);
 
     const handleSubmit = () => {
@@ -51,7 +53,7 @@ const DropdownItem = ({ option, onPropose }) => {
                 }}>
                 {option.label}
             </span>
-            <PickTime onChangeDate={setSelectedDate} />
+            <PickTime onChangeDate={setSelectedDate} startDate={startDate} endDate={endDate} />
             <button
                 className="button is-small is-info"
                 style={{ marginLeft: '20px', marginRight: '20px' }}
@@ -62,7 +64,7 @@ const DropdownItem = ({ option, onPropose }) => {
     );
 };
 
-const Dropdown = ({ options, onPropose }) => {
+const Dropdown = ({ options, onPropose, startDate, endDate }) => {
     return (
         <div className="dropdown is-active">
             <div className="dropdown-trigger">
@@ -77,7 +79,7 @@ const Dropdown = ({ options, onPropose }) => {
                 <div className="dropdown-content">
                     {options.map((option, index) => (
                         <React.Fragment key={option.value}>
-                            <DropdownItem option={option} onPropose={onPropose} />
+                            <DropdownItem option={option} onPropose={onPropose} startDate={startDate} endDate={endDate} />
                             {index < options.length - 1 && <hr className="dropdown-divider" />}
                         </React.Fragment>
                     ))}
