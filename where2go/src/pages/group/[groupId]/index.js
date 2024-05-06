@@ -41,6 +41,14 @@ const GroupDetailsPage = ({ user }) => {
         const userVotes = await db.fetchUserVotesByGroup(groupId, user.uid);
         const totalMembers = details.membersId ? details.membersId.length : 0;
 
+
+        if (!details.membersId.includes(user.uid)) {
+          // User is not a group member
+          alert('You are not a member of this group.');
+          router.push('/'); // Redirect to home or any other page
+          return; // Prevent further execution
+        }
+
         setGroupDetails(details);
         setPlaces(userPlaces);
         setProposals(groupProposals.map(proposal => ({
