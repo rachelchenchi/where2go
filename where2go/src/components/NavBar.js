@@ -15,25 +15,17 @@ const Navbar = ({ user }) => {
 
   return (
     <nav className="navbar" role="navigation" aria-label="main navigation">
-      <div className="navbar-brand">
-        <Link href="/" className="navbar-item">
-          Home
-        </Link>
-        <Link href="/private" className="navbar-item">
-          Private Space
-        </Link>
-        <Link href="/group" className="navbar-item">
-          Group Space
-        </Link>
-      </div>
-
-      <div className="navbar-menu">
-        <div className="navbar-start">
-          {/* Left empty for alignment purposes if needed */}
-        </div>
-
-        <div className="navbar-item has-text-weight-bold is-size-4">
-          <span>WHERE2GO</span> {/* Centered logo or text */}
+        <div className="navbar-brand">
+            <Link href="/" className="navbar-item has-text-weight-bold is-size-4">
+                <img src="/hands-up.png" alt="Logo" style={{ marginRight: '10px' }} />
+                <span>WHERE2GO</span>
+            </Link>
+            <Link href="/private" className="navbar-item">
+                Private Space
+            </Link>
+            <Link href="/group" className="navbar-item">
+                Group Space
+            </Link>
         </div>
 
         <div className="navbar-end">
@@ -56,7 +48,6 @@ const Navbar = ({ user }) => {
             </div>
           )}
         </div>
-      </div>
     </nav>
   );
 };
