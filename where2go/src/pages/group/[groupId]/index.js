@@ -189,7 +189,7 @@ const GroupDetailsPage = ({ user }) => {
               )}
             </div>
 
-            <div className="column is-6" style={{ minHeight: '600px' }}>
+            <div className="column is-6" style={{ minHeight: '700px' }}>
 
               <p className="notification is-warning is-light" style={{ textAlign: 'center' }}>
               Please choose from the <strong>options</strong> on the left <br/>or view the 
