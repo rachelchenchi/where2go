@@ -33,7 +33,7 @@ const Card = ({
             Check on Yelp
           </a>
           <p style={{ margin: '10px' }}>
-            Note: Let's go here on <strong>{date}</strong> at <strong>{time} ET</strong>.
+            Note: Let&apos;s go here on <strong>{date}</strong> at <strong>{time} ET</strong>.
           </p>
         </div>
 

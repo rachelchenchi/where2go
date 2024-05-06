@@ -21,7 +21,7 @@ const PickTime = ({ onChangeDate, startDate, endDate }) => {
             maxDate={new Date(endDate)}
             // className="date-picker-dropdown"
         >
-            <div style={{ color: "red" }}>Don't forget to check the weather!</div>
+            <div style={{ color: "red" }}>Don&apos;t forget to check the weather!</div>
         </DatePicker>
     );
 };
