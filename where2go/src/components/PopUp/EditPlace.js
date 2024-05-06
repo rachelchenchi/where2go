@@ -138,7 +138,7 @@ const EditPlaceModal = ({ isOpen, onClose, onPlaceUpdated, place }) => {
                         <input
                             className={styles.input}
                             type="text"
-                            placeholder="Enter tags"
+                            placeholder="Enter tags, separate them with a comma"
                             value={tags}
                             onChange={(e) => setTags(e.target.value)}
                         />
