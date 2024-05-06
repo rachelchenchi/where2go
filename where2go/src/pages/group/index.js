@@ -9,8 +9,11 @@ import EditGroupModal from "../../components/PopUp/EditGroup";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
-const Group = ({ user }) => {
+const Group = ({ }) => {
+  const [user, setUser] = useState(null);
+  
   const [groups, setGroups] = useState([]);
   const router = useRouter();
 
@@ -23,25 +26,29 @@ const Group = ({ user }) => {
   const [endDate, setEndDate] = useState();
 
   useEffect(() => {
-    console.log("User state changed");
-    if (!user) {
-      alert("You have to sign in first");
-      router.push("/login");
-    }
-  }, []);
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
+      if (authenticatedUser) {
+        console.log("User is signed in");
+        setUser(authenticatedUser);
+        fetchGroups(authenticatedUser.uid);
+      } else {
+        console.log("No user signed in");
+        alert("You have to sign in first");
+        router.push("/login");
+      }
+    });
 
-  const fetchGroups = async () => {
-    if (user) {
-      const fetchedGroups = await db.getAllGroups(user.uid);
+    return () => unsubscribe(); // Cleanup on unmount
+  }, [router]);
+
+  const fetchGroups = async (userId) => {
+    if (userId) {
+      const fetchedGroups = await db.getAllGroups(userId);
       setGroups(fetchedGroups);
-    } else {
-      setGroups([]);
     }
   };
 
-  useEffect(() => {
-    fetchGroups();
-  }, [user]);
 
   const handleGroupCreated = async (event) => {
     event.preventDefault();

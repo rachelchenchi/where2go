@@ -5,7 +5,6 @@ import Dropdown from '@/components/groupVote/dropdown';
 import Card from '@/components/groupVote/card';
 import * as db from '@/database';
 import Link from 'next/link';
-// import 'react-datepicker/dist/react-datepicker.css';
 
 
 const GroupDetailsPage = ({ user }) => {
@@ -40,13 +39,11 @@ const GroupDetailsPage = ({ user }) => {
         const details = await db.getGroup(groupId);
 
         if (!details.membersId.includes(user.uid)) {
-          // User is not a group member
           alert('You are not a member of this group.');
-          router.push('/'); // Redirect to home or any other page
-          return; // Prevent further execution
+          router.push('/');
+          return;
         }
         setIsMember(true);
-
 
 
         const userPlaces = await db.getUserPlaces(user.uid);
@@ -55,7 +52,6 @@ const GroupDetailsPage = ({ user }) => {
         const totalMembers = details.membersId ? details.membersId.length : 0;
 
 
-        
         setGroupDetails(details);
         setPlaces(userPlaces);
         setProposals(groupProposals.map(proposal => ({

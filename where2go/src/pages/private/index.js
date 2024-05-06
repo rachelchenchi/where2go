@@ -7,33 +7,35 @@ import PlaceDisplay from '../../components/places/PlaceDisplay';
 import * as db from '../../database';
 import { useRouter } from 'next/router';
 
-const Private = ({ user }) => {
+const Private = ({}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [places, setPlaces] = useState([]);
     const router = useRouter();
+    const [user, setUser] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editPlace, setEditPlace] = useState(null);
 
     useEffect(() => {
-        console.log("User state changed");
-        if (!user) {
-            alert("You have to sign in first");
-            router.push('/login');
-        }
-    }, []);
-
-
-    useEffect(() => {
-        const fetchPlaces = async () => {
-            if (user) {
-                const fetchedPlaces = await db.getUserPlaces(user.uid);
-                setPlaces(fetchedPlaces);
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (authenticatedUser) => {
+            if (authenticatedUser) {
+                console.log("User is signed in");
+                setUser(authenticatedUser);
+                fetchPlaces(authenticatedUser.uid);
             } else {
-                setPlaces([]);
+                console.log("No user signed in");
+                alert("You have to sign in first");
+                router.push('/login');
             }
-        };
-        fetchPlaces();
-    }, [user]);
+        });
+
+        return () => unsubscribe(); // Cleanup subscription on unmount
+    }, [router]);
+
+    const fetchPlaces = async (userId) => {
+        const fetchedPlaces = await db.getUserPlaces(userId);
+        setPlaces(fetchedPlaces);
+    };
 
     const handlePlaceAdded = (newplace) => {
         setPlaces((prevPlaces) => [...prevPlaces, newplace]);
