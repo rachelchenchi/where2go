@@ -146,7 +146,7 @@ const GroupDetailsPage = ({ user }) => {
         <div className="title has-text-centered" style={{ margin: '20px' }}>
           Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
         </div>
-        <div className="mt-3" style={{ display: 'flex', justifyContent: 'center' }}>
+        <div className="mt-3" style={{ display: 'flex', justifyContent: 'center', margin: '50px'}}>
           <Link href="/group">
             <button className="button is-info is-small">Back to Group List</button>
           </Link>
