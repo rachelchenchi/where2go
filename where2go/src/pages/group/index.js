@@ -69,7 +69,7 @@ const Group = ({ }) => {
       };
       await db.createGroup(groupData);
       console.log("Group created successfully");
-      await fetchGroups();
+      await fetchGroups(user.uid);
     } catch (error) {
       console.error("Error creating group:", error);
     }
@@ -115,7 +115,7 @@ const Group = ({ }) => {
       };
       await db.updateGroup(groupId, updatedData);
       console.log("Group joined successfully");
-      await fetchGroups();
+      await fetchGroups(user.uid);
     } catch (error) {
       console.error("Error joining group:", error);
     }
@@ -130,7 +130,7 @@ const Group = ({ }) => {
       try {
         await db.deleteGroup(group.id, user.uid);
         console.log("You have deleted the group.");
-        await fetchGroups();
+        await fetchGroups(user.uid);
       } catch (error) {
         console.error("Error deleting group:", error);
         alert("Failed to delete the group."); // Notify user about the error
@@ -144,7 +144,7 @@ const Group = ({ }) => {
     try {
       await db.updateGroup(groupId, updatedData);
       console.log("Group updated successfully");
-      await fetchGroups();
+      await fetchGroups(user.uid);
     } catch (error) {
       console.error("Error updating group:", error);
       alert("Failed to delete the group."); // Notify user about the error
@@ -194,7 +194,7 @@ const Group = ({ }) => {
             membersId: updatedMembersId,
           });
           console.log("You have left the group.");
-          await fetchGroups();
+          await fetchGroups(user.uid);
         } else {
           console.error("No such group exists.");
           alert("Failed to leave the group."); // Notify user if group does not exist
