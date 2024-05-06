@@ -22,16 +22,18 @@ const Card = ({
             <p className="title is-3">{placeName}</p>
           </div>
         </div>
-        
+
         <div className="content">
           <a href={yelpUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="button is-small is-link is-outlined">
+            className="button is-small is-link is-outlined"
+            style={{ color: 'salmon' }}
+            >
             Check on Yelp
           </a>
           <p style={{ margin: '10px' }}>
-            Note: Let's go here on {date} at {time} ET.
+            Note: Let's go here on <strong>{date}</strong> at <strong>{time} ET</strong>.
           </p>
         </div>
 

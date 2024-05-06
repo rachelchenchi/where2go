@@ -94,14 +94,25 @@ const GroupDetailsPage = ({ user }) => {
     }
   };
 
+
+
   const handleDeleteProposal = async (proposalId) => {
-    try {
-      await db.deleteProposal(proposalId);
-      setProposals(prevProposals => prevProposals.filter(proposal => proposal.id !== proposalId));
-    } catch (error) {
-      console.error('Error deleting proposal:', error);
+    const userConfirmed = window.confirm("Are you sure you want to delete this proposal?");
+
+    if (userConfirmed) {
+        try {
+            await db.deleteProposal(proposalId);
+            setProposals(prevProposals => prevProposals.filter(proposal => proposal.id !== proposalId));
+            console.log("Proposal deleted successfully.");
+        } catch (error) {
+            console.error('Error deleting proposal:', error);
+            alert("Failed to delete the proposal.");
+        }
+    } else {
+        console.log("User decided not to delete the proposal.");
     }
-  };
+};
+
 
 
 
@@ -143,7 +154,7 @@ const GroupDetailsPage = ({ user }) => {
 
         <div className='container' style={{ margin: '20px' }}>
           <div className="columns">
-            <div className="column is-7">
+            <div className="column is-6">
               {places.length ? (
                 <MemoizedDropdown
                   options={places.map(place => ({
@@ -157,18 +168,20 @@ const GroupDetailsPage = ({ user }) => {
                 />
               ) : (
                 <p className="notification is-primary is-light" style={{ textAlign: 'center' }}>
-                  <strong>No places available</strong>. 
-                  Please add some places at your 
-                  <strong><Link href="/group"> Private Space</Link></strong> first!
+                  No places available.<br/>
+                  Please add some places at your  
+                  <strong>
+                    <Link href="/private" style={{ textDecoration: 'none', color: 'blue' }}> Private Space</Link>
+                    </strong> first!
                 </p>
               )}
             </div>
 
-            <div className="column is-5" style={{ minHeight: '600px' }}>
+            <div className="column is-6" style={{ minHeight: '600px' }}>
 
               <p className="notification is-warning is-light" style={{ textAlign: 'center' }}>
-                Select from the options on the left
-                 <strong> (if available)</strong>
+              Please choose from the <strong>options</strong> on the left <br/>or view the 
+              <strong> Proposals </strong> submitted by others below.
               </p>
 
               {proposals.map((proposal, index) => (
