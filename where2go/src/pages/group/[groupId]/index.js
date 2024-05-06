@@ -40,7 +40,7 @@ const GroupDetailsPage = ({ user }) => {
 
         if (!details.membersId.includes(user.uid)) {
           alert('You are not a member of this group.');
-          router.push('/');
+          router.push('/group');
           return;
         }
         setIsMember(true);
