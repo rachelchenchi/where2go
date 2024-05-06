@@ -20,6 +20,8 @@ const GroupDetailsPage = ({ user }) => {
   const MemoizedCard = React.memo(Card);
   const MemoizedDropdown = React.memo(Dropdown);
 
+  const [isMember, setIsMember] = useState(false);
+
 
   useEffect(() => {
     console.log("Component rerendered");
@@ -36,11 +38,6 @@ const GroupDetailsPage = ({ user }) => {
     const fetchInitialData = async () => {
       try {
         const details = await db.getGroup(groupId);
-        const userPlaces = await db.getUserPlaces(user.uid);
-        const groupProposals = await db.fetchProposalsByGroup(groupId);
-        const userVotes = await db.fetchUserVotesByGroup(groupId, user.uid);
-        const totalMembers = details.membersId ? details.membersId.length : 0;
-
 
         if (!details.membersId.includes(user.uid)) {
           // User is not a group member
@@ -48,7 +45,17 @@ const GroupDetailsPage = ({ user }) => {
           router.push('/'); // Redirect to home or any other page
           return; // Prevent further execution
         }
+        setIsMember(true);
 
+
+
+        const userPlaces = await db.getUserPlaces(user.uid);
+        const groupProposals = await db.fetchProposalsByGroup(groupId);
+        const userVotes = await db.fetchUserVotesByGroup(groupId, user.uid);
+        const totalMembers = details.membersId ? details.membersId.length : 0;
+
+
+        
         setGroupDetails(details);
         setPlaces(userPlaces);
         setProposals(groupProposals.map(proposal => ({
@@ -150,6 +157,7 @@ const GroupDetailsPage = ({ user }) => {
         <link rel="icon" href="/hands-up.png" />
       </Head>
 
+      {isMember ? (
       <div style={{ marginLeft: '200px', marginRight: '200px' }}>
         <div className="title has-text-centered" style={{ margin: '20px' }}>
           Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
@@ -216,6 +224,11 @@ const GroupDetailsPage = ({ user }) => {
           </div>
         </div>
       </div>
+      ):(
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+        <p>You do not have permission to view this page.</p>
+      </div>
+      )}
     </>
   );
 };
