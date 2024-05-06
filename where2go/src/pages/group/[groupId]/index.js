@@ -113,7 +113,7 @@ const GroupDetailsPage = ({ user }) => {
         ...prevVotes,
         [proposalId]: result === "vote added" ? true : false
       }));
-      
+
       alert(result === "vote added" ? "Vote Added" : "Vote Removed");
     } catch (error) {
       console.error('Error toggling vote:', error);
@@ -130,7 +130,7 @@ const GroupDetailsPage = ({ user }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/hands-up.png" />
       </Head>
-      
+
       <div style={{ marginLeft: '200px', marginRight: '200px' }}>
         <div className="title has-text-centered" style={{ margin: '20px' }}>
           Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
@@ -156,13 +156,20 @@ const GroupDetailsPage = ({ user }) => {
                   endDate={groupDetails.endDate}
                 />
               ) : (
-                <p className="notification is-primary">
-                  No places available. Please add some places at your Private Space first
+                <p className="notification is-primary is-light" style={{ textAlign: 'center' }}>
+                  <strong>No places available</strong>. 
+                  Please add some places at your 
+                  <strong><Link href="/group"> Private Space</Link></strong> first!
                 </p>
               )}
             </div>
 
-            <div className="column is-5" style={{ minHeight: '600px'}}> 
+            <div className="column is-5" style={{ minHeight: '600px' }}>
+
+              <p className="notification is-warning is-light" style={{ textAlign: 'center' }}>
+                Select from the options on the left
+                 <strong> (if available)</strong>
+              </p>
 
               {proposals.map((proposal, index) => (
                 <MemoizedCard
