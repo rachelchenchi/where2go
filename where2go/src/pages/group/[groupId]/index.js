@@ -88,7 +88,6 @@ const GroupDetailsPage = ({ user }) => {
       groupId,
       userId: user.uid,
       placeId: place.value,
-      // imageUrl: place.imageUrl, 
       yelpUrl: place.yelpUrl,
       name: place.label,
       date: date ? date.toLocaleDateString() : undefined,
@@ -112,66 +111,85 @@ const GroupDetailsPage = ({ user }) => {
     const userConfirmed = window.confirm("Are you sure you want to delete this proposal?");
 
     if (userConfirmed) {
-        try {
-            await db.deleteProposal(proposalId);
-            setProposals(prevProposals => prevProposals.filter(proposal => proposal.id !== proposalId));
-            console.log("Proposal deleted successfully.");
-        } catch (error) {
-            console.error('Error deleting proposal:', error);
-            alert("Failed to delete the proposal.");
-        }
+      try {
+        await db.deleteProposal(proposalId);
+        setProposals(prevProposals => prevProposals.filter(proposal => proposal.id !== proposalId));
+        console.log("Proposal deleted successfully.");
+      } catch (error) {
+        console.error('Error deleting proposal:', error);
+        alert("Failed to delete the proposal.");
+      }
     } else {
-        console.log("User decided not to delete the proposal.");
+      console.log("User decided not to delete the proposal.");
     }
-};
-
+  };
 
 
 
   // const handleVoteToggle = async (proposalId, hasVoted) => {
   //   try {
   //     const result = await db.toggleVote(groupId, proposalId, user.uid, hasVoted);
-
-  //     setUserVotes(prevVotes => ({
-  //       ...prevVotes,
-  //       [proposalId]: result === "vote added" ? true : false
-  //     }));
-
+  //     if (result === "vote added") {
+  //       setProposals(prevProposals => prevProposals.map(proposal => {
+  //         if (proposal.id === proposalId) {
+  //           return { ...proposal, votes: proposal.votes + 1 };
+  //         }
+  //         return proposal;
+  //       }));
+  //       setUserVotes(prevVotes => ({
+  //         ...prevVotes,
+  //         [proposalId]: true
+  //       }));
+  //     } else if (result === "vote removed") {
+  //       setProposals(prevProposals => prevProposals.map(proposal => {
+  //         if (proposal.id === proposalId) {
+  //           return { ...proposal, votes: proposal.votes - 1 };
+  //         }
+  //         return proposal;
+  //       }));
+  //       setUserVotes(prevVotes => ({
+  //         ...prevVotes,
+  //         [proposalId]: false
+  //       }));
+  //     }
   //     alert(result === "vote added" ? "Vote Added" : "Vote Removed");
   //   } catch (error) {
   //     console.error('Error toggling vote:', error);
   //   }
   // };
 
-  const handleVoteToggle = async (proposalId, hasVoted) => {
+  const handleVoteToggle = async (proposalId) => {
+    const hasVoted = userVotes[proposalId];
+  
+    setProposals(prevProposals => prevProposals.map(proposal => {
+      if (proposal.id === proposalId) {
+        const adjustedVotes = hasVoted ? proposal.votes - 1 : proposal.votes + 1;
+        return {...proposal, votes: adjustedVotes};
+      }
+      return proposal;
+    }));
+    setUserVotes(prevVotes => ({
+      ...prevVotes,
+      [proposalId]: !hasVoted
+    }));
+  
     try {
       const result = await db.toggleVote(groupId, proposalId, user.uid, hasVoted);
-      if (result === "vote added") {
-        setProposals(prevProposals => prevProposals.map(proposal => {
-          if (proposal.id === proposalId) {
-            return {...proposal, votes: proposal.votes + 1};
-          }
-          return proposal;
-        }));
-        setUserVotes(prevVotes => ({
-          ...prevVotes,
-          [proposalId]: true
-        }));
-      } else if (result === "vote removed") {
-        setProposals(prevProposals => prevProposals.map(proposal => {
-          if (proposal.id === proposalId) {
-            return {...proposal, votes: proposal.votes - 1};
-          }
-          return proposal;
-        }));
-        setUserVotes(prevVotes => ({
-          ...prevVotes,
-          [proposalId]: false
-        }));
-      }
       alert(result === "vote added" ? "Vote Added" : "Vote Removed");
     } catch (error) {
       console.error('Error toggling vote:', error);
+      setProposals(prevProposals => prevProposals.map(proposal => {
+        if (proposal.id === proposalId) {
+          const adjustedVotes = hasVoted ? proposal.votes + 1 : proposal.votes - 1;
+          return {...proposal, votes: adjustedVotes};
+        }
+        return proposal;
+      }));
+      setUserVotes(prevVotes => ({
+        ...prevVotes,
+        [proposalId]: hasVoted
+      }));
+      alert("Failed to toggle vote.");
     }
   };
   
@@ -188,76 +206,76 @@ const GroupDetailsPage = ({ user }) => {
       </Head>
 
       {isMember ? (
-      <div style={{ marginLeft: '200px', marginRight: '200px' }}>
-        <div className="title has-text-centered" style={{ margin: '20px' }}>
-          Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
-        </div>
-        <div className="mt-3" style={{ display: 'flex', justifyContent: 'center', margin: '50px'}}>
-          <Link href="/group">
-            <button className="button is-info is-small">Back to Group List</button>
-          </Link>
-        </div>
+        <div style={{ marginLeft: '200px', marginRight: '200px' }}>
+          <div className="title has-text-centered" style={{ margin: '20px' }}>
+            Welcome Group: {groupDetails ? groupDetails.groupName : "Loading"}
+          </div>
+          <div className="mt-3" style={{ display: 'flex', justifyContent: 'center', margin: '50px' }}>
+            <Link href="/group">
+              <button className="button is-info is-small">Back to Group List</button>
+            </Link>
+          </div>
 
-        <div className='container' style={{ margin: '20px' }}>
-          <div className="columns">
-            <div className="column is-6">
-              {places.length ? (
-                <MemoizedDropdown
-                  options={places.map(place => ({
-                    value: place.id,
-                    label: place.name,
-                    yelpUrl: place.yelpUrl
-                  }))}
-                  onPropose={handlePropose}
-                  startDate={groupDetails.startDate}
-                  endDate={groupDetails.endDate}
-                />
-              ) : (
-                <p className="notification is-primary is-light" style={{ textAlign: 'center' }}>
-                  No places available.<br/>
-                  Please add some places at your  
-                  <strong>
-                    <Link href="/private" style={{ textDecoration: 'none', color: 'blue' }}> Private Space</Link>
+          <div className='container' style={{ margin: '20px' }}>
+            <div className="columns">
+              <div className="column is-6">
+                {places.length ? (
+                  <MemoizedDropdown
+                    options={places.map(place => ({
+                      value: place.id,
+                      label: place.name,
+                      yelpUrl: place.yelpUrl
+                    }))}
+                    onPropose={handlePropose}
+                    startDate={groupDetails.startDate}
+                    endDate={groupDetails.endDate}
+                  />
+                ) : (
+                  <p className="notification is-primary is-light" style={{ textAlign: 'center' }}>
+                    No places available.<br />
+                    Please add some places at your
+                    <strong>
+                      <Link href="/private" style={{ textDecoration: 'none', color: 'blue' }}> Private Space</Link>
                     </strong> first!
+                  </p>
+                )}
+              </div>
+
+              <div className="column is-6" style={{ minHeight: '700px' }}>
+
+                <p className="notification is-warning is-light" style={{ textAlign: 'center' }}>
+                  Please choose from the <strong>options</strong> on the left <br />or view the
+                  <strong> Proposals </strong> submitted by others below.
                 </p>
-              )}
-            </div>
 
-            <div className="column is-6" style={{ minHeight: '700px' }}>
+                {proposals.map((proposal, index) => (
+                  <MemoizedCard
+                    key={proposal.id}
+                    index={index}
+                    // imageUrl={proposal.imageUrl}
+                    userId={proposal.userId}
+                    currentUser={user ? user.uid : null}
+                    yelpUrl={proposal.yelpUrl}
+                    placeName={proposal.name}
+                    date={proposal.date}
+                    time={proposal.time}
+                    votes={proposal.votes}
+                    onVote={() => handleVoteToggle(proposal.id)}
+                    onDelete={() => handleDeleteProposal(proposal.id)}
+                    hasVoted={!!userVotes[proposal.id]}
+                    totalMembers={proposal.totalMembers}
+                  />
+                ))}
 
-              <p className="notification is-warning is-light" style={{ textAlign: 'center' }}>
-              Please choose from the <strong>options</strong> on the left <br/>or view the 
-              <strong> Proposals </strong> submitted by others below.
-              </p>
-
-              {proposals.map((proposal, index) => (
-                <MemoizedCard
-                  key={proposal.id}
-                  index={index}
-                  // imageUrl={proposal.imageUrl}
-                  userId={proposal.userId}
-                  currentUser={user ? user.uid : null}
-                  yelpUrl={proposal.yelpUrl}
-                  placeName={proposal.name}
-                  date={proposal.date}
-                  time={proposal.time}
-                  votes={proposal.votes}
-                  onVote={() => handleVoteToggle(proposal.id)}
-                  onDelete={() => handleDeleteProposal(proposal.id)}
-                  hasVoted={!!userVotes[proposal.id]}
-                  totalMembers={proposal.totalMembers}
-                />
-              ))}
+              </div>
 
             </div>
-
           </div>
         </div>
-      </div>
-      ):(
+      ) : (
         <div style={{ padding: '20px', textAlign: 'center' }}>
-        <p>You do not have permission to view this page.</p>
-      </div>
+          <p>You do not have permission to view this page.</p>
+        </div>
       )}
     </>
   );
