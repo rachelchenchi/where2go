@@ -29,7 +29,7 @@ const Private = ({}) => {
             }
         });
 
-        return () => unsubscribe(); // Cleanup subscription on unmount
+        return () => unsubscribe();
     }, [router]);
 
     const fetchPlaces = async (userId) => {

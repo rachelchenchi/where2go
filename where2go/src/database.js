@@ -137,7 +137,7 @@ export const getCommunityPlaces = async () => {
 export const addProposal = async (proposalData) => {
   try {
     const proposalsCollection = collection(db, "proposals");
-    const docRef = await addDoc(proposalsCollection, {...proposalData, votes: 0});
+    const docRef = await addDoc(proposalsCollection, { ...proposalData, votes: 0 });
     console.log("Proposal added with ID: ", docRef.id);
     await updateDoc(doc(db, "proposals", docRef.id), {
       proposalId: docRef.id
@@ -157,7 +157,7 @@ export const fetchProposalsByGroup = async (groupId) => {
     const proposalQuery = query(proposalsCollection, where("groupId", "==", groupId));
     const proposalSnapshot = await getDocs(proposalQuery);
     const proposals = [];
-    
+
     for (const doc of proposalSnapshot.docs) {
       const proposalId = doc.id;
       const voteQuery = query(votesCollection, where("proposalId", "==", proposalId));

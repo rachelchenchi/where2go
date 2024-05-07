@@ -39,7 +39,7 @@ const Group = ({ }) => {
       }
     });
 
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, [router]);
 
   const fetchGroups = async (userId) => {

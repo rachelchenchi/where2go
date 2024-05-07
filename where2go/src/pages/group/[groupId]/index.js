@@ -126,45 +126,13 @@ const GroupDetailsPage = ({ user }) => {
 
 
 
-  // const handleVoteToggle = async (proposalId, hasVoted) => {
-  //   try {
-  //     const result = await db.toggleVote(groupId, proposalId, user.uid, hasVoted);
-  //     if (result === "vote added") {
-  //       setProposals(prevProposals => prevProposals.map(proposal => {
-  //         if (proposal.id === proposalId) {
-  //           return { ...proposal, votes: proposal.votes + 1 };
-  //         }
-  //         return proposal;
-  //       }));
-  //       setUserVotes(prevVotes => ({
-  //         ...prevVotes,
-  //         [proposalId]: true
-  //       }));
-  //     } else if (result === "vote removed") {
-  //       setProposals(prevProposals => prevProposals.map(proposal => {
-  //         if (proposal.id === proposalId) {
-  //           return { ...proposal, votes: proposal.votes - 1 };
-  //         }
-  //         return proposal;
-  //       }));
-  //       setUserVotes(prevVotes => ({
-  //         ...prevVotes,
-  //         [proposalId]: false
-  //       }));
-  //     }
-  //     alert(result === "vote added" ? "Vote Added" : "Vote Removed");
-  //   } catch (error) {
-  //     console.error('Error toggling vote:', error);
-  //   }
-  // };
-
   const handleVoteToggle = async (proposalId) => {
     const hasVoted = userVotes[proposalId];
-  
+
     setProposals(prevProposals => prevProposals.map(proposal => {
       if (proposal.id === proposalId) {
         const adjustedVotes = hasVoted ? proposal.votes - 1 : proposal.votes + 1;
-        return {...proposal, votes: adjustedVotes};
+        return { ...proposal, votes: adjustedVotes };
       }
       return proposal;
     }));
@@ -172,7 +140,7 @@ const GroupDetailsPage = ({ user }) => {
       ...prevVotes,
       [proposalId]: !hasVoted
     }));
-  
+
     try {
       const result = await db.toggleVote(groupId, proposalId, user.uid, hasVoted);
       alert(result === "vote added" ? "Vote Added" : "Vote Removed");
@@ -181,7 +149,7 @@ const GroupDetailsPage = ({ user }) => {
       setProposals(prevProposals => prevProposals.map(proposal => {
         if (proposal.id === proposalId) {
           const adjustedVotes = hasVoted ? proposal.votes + 1 : proposal.votes - 1;
-          return {...proposal, votes: adjustedVotes};
+          return { ...proposal, votes: adjustedVotes };
         }
         return proposal;
       }));
@@ -192,7 +160,7 @@ const GroupDetailsPage = ({ user }) => {
       alert("Failed to toggle vote.");
     }
   };
-  
+
 
 
 
@@ -214,6 +182,14 @@ const GroupDetailsPage = ({ user }) => {
             <Link href="/group">
               <button className="button is-info is-small">Back to Group List</button>
             </Link>
+          </div>
+
+          <div>
+            <p className="notification is-info is-light" style={{ textAlign: 'center' }}>
+              After adding or deleting a proposal,
+              please refresh the page to ensure you view the most updated votes.
+              Thank you
+            </p>
           </div>
 
           <div className='container' style={{ margin: '20px' }}>
@@ -252,7 +228,6 @@ const GroupDetailsPage = ({ user }) => {
                   <MemoizedCard
                     key={proposal.id}
                     index={index}
-                    // imageUrl={proposal.imageUrl}
                     userId={proposal.userId}
                     currentUser={user ? user.uid : null}
                     yelpUrl={proposal.yelpUrl}
