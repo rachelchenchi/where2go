@@ -28,6 +28,7 @@ const GroupDetailsPage = ({ user }) => {
 
     const unsubscribeProposals = db.listenForProposalUpdates(groupId, setProposals, console.error);
     const unsubscribeVotes = db.listenForVoteUpdates(groupId, voteUpdates => {
+      console.log("voteUpdates received:", voteUpdates);
       setProposals(prevProposals => prevProposals.map(proposal => ({
         ...proposal,
         votes: voteUpdates[proposal.id] || 0
@@ -127,20 +128,53 @@ const GroupDetailsPage = ({ user }) => {
 
 
 
+  // const handleVoteToggle = async (proposalId, hasVoted) => {
+  //   try {
+  //     const result = await db.toggleVote(groupId, proposalId, user.uid, hasVoted);
+
+  //     setUserVotes(prevVotes => ({
+  //       ...prevVotes,
+  //       [proposalId]: result === "vote added" ? true : false
+  //     }));
+
+  //     alert(result === "vote added" ? "Vote Added" : "Vote Removed");
+  //   } catch (error) {
+  //     console.error('Error toggling vote:', error);
+  //   }
+  // };
+
   const handleVoteToggle = async (proposalId, hasVoted) => {
     try {
       const result = await db.toggleVote(groupId, proposalId, user.uid, hasVoted);
-
-      setUserVotes(prevVotes => ({
-        ...prevVotes,
-        [proposalId]: result === "vote added" ? true : false
-      }));
-
+      if (result === "vote added") {
+        setProposals(prevProposals => prevProposals.map(proposal => {
+          if (proposal.id === proposalId) {
+            return {...proposal, votes: proposal.votes + 1};
+          }
+          return proposal;
+        }));
+        setUserVotes(prevVotes => ({
+          ...prevVotes,
+          [proposalId]: true
+        }));
+      } else if (result === "vote removed") {
+        setProposals(prevProposals => prevProposals.map(proposal => {
+          if (proposal.id === proposalId) {
+            return {...proposal, votes: proposal.votes - 1};
+          }
+          return proposal;
+        }));
+        setUserVotes(prevVotes => ({
+          ...prevVotes,
+          [proposalId]: false
+        }));
+      }
       alert(result === "vote added" ? "Vote Added" : "Vote Removed");
     } catch (error) {
       console.error('Error toggling vote:', error);
     }
   };
+  
 
 
 

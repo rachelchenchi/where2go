@@ -3,7 +3,7 @@ import React from 'react';
 
 const Card = ({
   index, proposalId, userId, currentUser, totalMembers,
-  onVote, onDelete, votes, imageUrl, date,
+  onVote, onDelete, votes, date,
   time, yelpUrl, placeName, hasVoted }) => {
 
   const handleVoteClick = () => {

@@ -150,22 +150,47 @@ export const addProposal = async (proposalData) => {
 };
 
 
+// export const fetchProposalsByGroup = async (groupId) => {
+//   try {
+//     const proposalsCollection = collection(db, "proposals");
+//     const q = query(proposalsCollection, where("groupId", "==", groupId));
+//     const querySnapshot = await getDocs(q);
+//     const proposals = [];
+//     querySnapshot.forEach((doc) => {
+//       const data = doc.data();
+//       proposals.push({ id: doc.id, ...data, votes: data.votes || 0 });
+//     });
+//     return proposals;
+//   } catch (error) {
+//     console.error("Error fetching proposals: ", error);
+//     throw new Error("Failed to fetch proposals");
+//   }
+// };
+
 export const fetchProposalsByGroup = async (groupId) => {
   try {
     const proposalsCollection = collection(db, "proposals");
-    const q = query(proposalsCollection, where("groupId", "==", groupId));
-    const querySnapshot = await getDocs(q);
+    const votesCollection = collection(db, "votes");
+    const proposalQuery = query(proposalsCollection, where("groupId", "==", groupId));
+    const proposalSnapshot = await getDocs(proposalQuery);
     const proposals = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      proposals.push({ id: doc.id, ...data, votes: data.votes || 0 });
-    });
+    
+    for (const doc of proposalSnapshot.docs) {
+      const proposalId = doc.id;
+      const voteQuery = query(votesCollection, where("proposalId", "==", proposalId));
+      const voteSnapshot = await getDocs(voteQuery);
+      const votesCount = voteSnapshot.size;
+
+      proposals.push({ id: doc.id, ...doc.data(), votes: votesCount });
+    }
+
     return proposals;
   } catch (error) {
     console.error("Error fetching proposals: ", error);
     throw new Error("Failed to fetch proposals");
   }
 };
+
 
 
 export const deleteProposal = async (proposalId) => {
@@ -225,6 +250,7 @@ export const listenForVoteUpdates = (groupId, callback) => {
 
   return unsubscribe;
 };
+
 
 
 export const toggleVote = async (groupId, proposalId, userId) => {
