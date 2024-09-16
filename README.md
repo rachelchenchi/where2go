@@ -7,7 +7,7 @@
 ### Live Demo
 
 The application is available at:  
-**URL**: [https://milestone-3-ckx-six.vercel.app/](https://milestone-3-ckx-six.vercel.app/)
+**URL**: https://where2go-inky.vercel.app/
 
 ### Key Features
 
